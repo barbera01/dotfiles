@@ -1,0 +1,40 @@
+
+[font]
+  
+  normal = { family = "MesloLGLDZ Nerd Font",   style =  "Regular"}
+  bold = {  family =  "MesloLGLDZ Nerd Font",  style = "Bold"}
+  italic = {  family = "MesloLGLDZ Nerd Font" , style  = "Italic"}
+  bold_italic = { family = "MesloLGLDZ Nerd Font", style = "Bold Italic"}
+  size = 14.0
+  offset = { x = 0, y = 0}
+  glyph_offset = { x = 0, y = 0}
+
+
+# Window configuration
+[window]
+  dynamic_padding =  false
+  opacity = 0.85
+  decorations = "buttonless"
+  position = { x = 50, y = 125 } # (has no effect on Wayland)
+  dimensions = { columns = 250, lines = 58 }
+
+# Colors (optional customization)
+[colors]
+  primary ={ background = "#000000", foreground = "#abb2bf"}
+  cursor ={ text = "#282c34", cursor = "#528bff"}
+
+
+# Scrolling configuration
+[scrolling] 
+  history = 1000
+  multiplier = 3
+
+
+# Mouse configuration
+[mouse]
+  hide_when_typing = true
+
+# Other settings (optional)
+[env]
+  TERM = "xterm-256color"
+
