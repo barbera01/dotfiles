@@ -24,31 +24,32 @@ Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 3. Stow the packages you want:
    ```bash
-   stow alacritty
+   stow -t ~ alacritty
    ```
 
 ## Packages
 
 - **alacritty** - Terminal emulator configuration
+- **btop** - System resource monitor
 
 ## Usage
 
 ### Installing a package
 
 ```bash
-stow <package-name>
+stow -t ~ <package-name>
 ```
 
 ### Removing a package
 
 ```bash
-stow -D <package-name>
+stow -D -t ~ <package-name>
 ```
 
 ### Re-stowing (useful after updates)
 
 ```bash
-stow -R <package-name>
+stow -R -t ~ <package-name>
 ```
 
 ## Adding new packages
@@ -63,7 +64,7 @@ stow -R <package-name>
    ```
 3. Stow it:
    ```bash
-   stow package-name
+   stow -t ~ package-name
    ```
 
 ## Structure
