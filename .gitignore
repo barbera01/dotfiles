@@ -1,1 +1,42 @@
-*.DS_Store
+
+# --- Neovim (LazyVim/Mason/Plugins) ---
+# Lazy plugin manager state
+lazy-lock.json
+
+# Mason packages (LSP servers, formatters, etc.)
+mason/
+mason.log
+
+# Lazy.nvim generated files
+lazy/
+plugin/lazy.lua
+
+# Local session files
+session/
+.sessions/
+
+# Swap/undo/backup files
+*.swp
+*.swo
+*.swm
+*.tmp
+*.bak
+*.undo
+
+# LSP logs
+lsp.log
+log/
+
+# Spell files (optional – remove if you want them tracked)
+spell/
+
+# --- OS-specific ---
+# macOS
+.DS_Store
+
+# Linux/Unix
+.nfs*
+
+# Windows
+Thumbs.db
+
