@@ -55,13 +55,30 @@ stow -R -t ~ <package-name>
 ## Adding new packages
 
 1. Create a directory with the package name
-2. Mirror the structure from `$HOME`:
-   ```
-   package-name/
-   └── .config/
-       └── package-name/
-           └── config-file
-   ```
+2. Mirror the structure from `$HOME`
+
+### For .config files:
+```
+package-name/
+└── .config/
+    └── package-name/
+        └── config-file
+```
+
+### For single files in home directory:
+```
+tmux/
+└── .tmux.conf
+```
+
+or
+
+```
+git/
+├── .gitconfig
+└── .gitignore_global
+```
+
 3. Stow it:
    ```bash
    stow -t ~ package-name
