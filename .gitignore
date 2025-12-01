@@ -1,7 +1,7 @@
 
 # --- Neovim (LazyVim/Mason/Plugins) ---
 # Lazy plugin manager state
-lazy-lock.json
+*lazy-lock.json
 
 # Mason packages (LSP servers, formatters, etc.)
 mason/
