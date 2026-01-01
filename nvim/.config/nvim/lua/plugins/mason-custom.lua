@@ -16,6 +16,7 @@ return {
         "prettier",
         "eslint_d",
         "typescript-language-server",
+        "debugpy",
       },
       -- Manually exclude problematic servers
       blacklist = { "nil", "gopls" },

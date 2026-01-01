@@ -5,7 +5,7 @@ return {
       require("posting").setup({
         keybinds = {
           {
-            binding = "<leader>po",
+            binding = "<leader>Po",
             command = ":OpenPosting<CR>",
             desc = "Open Posting",
           },
