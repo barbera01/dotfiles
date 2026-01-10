@@ -1,0 +1,190 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "anthropic/claude-haiku-4",
+
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      },
+      "models": {
+        "qwen3-coder": {
+          "id": "qwen3-coder:30b",
+          "context_limit": 32768,
+          "output_tokens": 8192
+        },
+        "gpt-oss": {
+          "id": "gpt-oss:20b",
+          "context_limit": 32768,
+          "output_tokens": 8192
+        },
+        "codellama": {
+          "id": "codellama:latest",
+          "context_limit": 16384,
+          "output_tokens": 4096
+        },
+        "llama3": {
+          "id": "llama3:latest",
+          "context_limit": 8192,
+          "output_tokens": 2048
+        }
+      }
+    }
+  },
+
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": true
+    }
+  },
+
+  "agent": {
+    "research": {
+      "model": "ollama/gpt-oss",
+      "temperature": 0.3,
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false,
+        "mcp": true
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "prompt": "You are a research specialist. Your role is to search, analyze, and understand codebases and documentation. Provide thorough analysis and insights without making changes to code."
+    },
+
+    "coder": {
+      "model": "ollama/qwen3-coder",
+      "temperature": 0.2,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": false
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "prompt": "You are a code generation specialist. Write clean, efficient, and well-documented code. Focus on implementing features and fixing bugs with minimal dependencies."
+    },
+
+    "architect": {
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.4,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "mcp": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      },
+      "prompt": "You are a software architect. Use MCP servers like Context7 to access up-to-date documentation. Design robust solutions, make architectural decisions, and leverage all available tools including bash and external integrations."
+    },
+
+    "executor": {
+      "model": "anthropic/claude-sonnet-4-5",
+      "temperature": 0.1,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "mcp": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      },
+      "prompt": "You are a task executor. Run tests, build projects, manage dependencies, and perform system operations. Use bash commands and MCP servers as needed to complete tasks efficiently."
+    },
+
+    "refactor": {
+      "model": "ollama/qwen3-coder",
+      "temperature": 0.2,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": false
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "prompt": "You are a refactoring specialist. Improve code quality, optimize performance, and enhance maintainability without changing functionality."
+    },
+
+    "general": {
+      "model": "ollama/llama3",
+      "temperature": 0.5,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": false
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny"
+      },
+      "prompt": "You are a general-purpose assistant. Help with various tasks including writing documentation, explaining concepts, and light coding tasks."
+    }
+  },
+
+  "default_agent": "architect",
+
+  "tools": {
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "mcp": true
+  },
+
+  "permission": {
+    "edit": "ask",
+    "bash": "ask"
+  },
+
+  "tui": {
+    "scroll_speed": 3,
+    "diff_style": "auto"
+  },
+
+  "autoupdate": "notify",
+
+  "compaction": {
+    "enabled": true,
+    "strategy": "auto"
+  },
+
+  "watcher": {
+    "ignore": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/__pycache__/**",
+      "**/.venv/**"
+    ]
+  },
+
+  "formatter": {
+    "javascript": {
+      "command": ["prettier", "--write"],
+      "extensions": [".js", ".jsx", ".ts", ".tsx"]
+    },
+    "python": {
+      "command": ["black", "-"],
+      "extensions": [".py"]
+    }
+  }
+}

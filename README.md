@@ -89,3 +89,29 @@ git/
 Each package directory mirrors the structure of your home directory. When you run `stow <package>`, it creates symlinks from your home directory to the files in this repo.
 
 For example, `alacritty/.config/alacritty/alacritty.toml` symlinks to `~/.config/alacritty/alacritty.toml`.
+
+Example
+### opencode
+
+OpenCode configuration managed with GNU Stow.
+
+#### Structure
+
+This package manages the following file:
+
+~/.config/opencode/opencode.json
+
+Repository layout:
+
+opencode/
+└── .config/
+    └── opencode/
+        └── opencode.json
+
+#### Installation
+
+From the root of the dotfiles repository:
+
+```bash
+stow -t ~ opencode
+
