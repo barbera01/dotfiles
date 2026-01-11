@@ -8,7 +8,7 @@ return {
       "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
-      "echasnovski/mini.pick",
+      "nvim-mini/mini.pick",
       "nvim-telescope/telescope.nvim",
       "hrsh7th/nvim-cmp",
       "ibhagwan/fzf-lua",
@@ -40,4 +40,3 @@ return {
     },
   },
 }
-

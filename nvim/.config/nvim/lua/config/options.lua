@@ -5,3 +5,10 @@ vim.g.mapleader = " "
 
 -- Disable problematic LSP servers in Mason
 vim.g.lazyvim_cmp = "blink"
+
+-- Enable Nerd Font icons
+vim.g.have_nerd_font = true
+
+-- Ensure proper icon rendering
+vim.opt.encoding = "utf-8"
+vim.opt.fileencoding = "utf-8"

@@ -1,8 +1,22 @@
 -- Keymaps are automatically loaded on the VeryLazy event
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
---
----- In your init.lua
+
+-- ============================================================
+-- Explorer - Let LazyVim use its default binding
+-- Auto-refresh is handled by autocmds.lua
+-- ============================================================
+-- Note: <leader>e uses LazyVim's default (snacks or neo-tree)
+local k9s = require("config.k9s")
+
+-- Manual refresh command
+vim.keymap.set("n", "<leader>rr", function()
+  vim.cmd("redraw!")
+end, { desc = "Force Redraw Screen" })
+
+-- ============================================================
+-- Debugging Keymaps
+-- ============================================================
 vim.keymap.set("n", "<F5>", function()
   require("dap").continue()
 end, { silent = true, desc = "DAP Continue" })
@@ -50,11 +64,21 @@ end, { silent = true, desc = "🐛 Quit Debug Session" })
 
 -- DAP control with visual feedback
 vim.keymap.set("n", "<F5>", function()
-  if vim.fn.filereadable('.vscode/launch.json') then
-    local dap_vscode = require('dap.ext.vscode')
-    dap_vscode.load_launchjs(nil, { 
-      ['pwa-node'] = {'javascript', 'javascriptreact'} 
+  if vim.fn.filereadable(".vscode/launch.json") then
+    local dap_vscode = require("dap.ext.vscode")
+    dap_vscode.load_launchjs(nil, {
+      ["pwa-node"] = { "javascript", "javascriptreact" },
     })
   end
   require("dap").continue()
 end, { silent = true, desc = "🐛 Start/Continue Debug" })
+
+require("which-key").add({
+  { "<leader>k", group = "Kubernetes" },
+})
+
+vim.keymap.set("n", "<leader>k", function()
+  k9s.toggle()
+end, {
+  desc = "k9s (Toggle)",
+})
