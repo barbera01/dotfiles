@@ -34,6 +34,8 @@ return {
         "jsonls",
         "marksman",
         "ts_ls",
+        "pyright",  -- Python LSP
+        "ruff",     -- Python linter/formatter (also acts as LSP)
       },
     },
   },

@@ -8,13 +8,13 @@ return {
   config = function()
     local dap, dapui = require("dap"), require("dapui")
     
-    -- Cool modern DAP UI configuration
+    -- Cool modern DAP UI configuration with enhanced visuals
     dapui.setup({
-      -- Modern icons
+      -- Modern icons with better visual hierarchy
       icons = { 
-        expanded = "󰅀", 
-        collapsed = "󰅂", 
-        current_frame = "󰁔"
+        expanded = "▾", 
+        collapsed = "▸", 
+        current_frame = "→"
       },
       
       -- Custom mappings
@@ -27,10 +27,14 @@ return {
         toggle = "t",
       },
       
+      -- Element mappings for better navigation
+      element_mappings = {},
+      
       -- Sleek layout with better proportions
+      -- Using RIGHT position to avoid conflicts with file explorer on the left
       layouts = {
         {
-          -- Primary debugging sidebar
+          -- Primary debugging sidebar (on the right to not conflict with explorer)
           elements = {
             {
               id = "scopes",
@@ -50,7 +54,7 @@ return {
             },
           },
           size = 60, -- Wider sidebar for better readability
-          position = "left",
+          position = "right", -- Right side to keep explorer on the left
         },
         {
           -- Bottom console area
@@ -76,20 +80,20 @@ return {
         },
       },
       
-      -- Enhanced controls
+      -- Enhanced controls with beautiful modern icons
       controls = {
         enabled = true,
         element = "repl",
         icons = {
-          pause = "󰏤",
-          play = "󰐊",
-          step_into = "󰆹",
-          step_over = "󰆷", 
-          step_out = "󰆸",
-          step_back = "󰕍",
-          run_last = "󰑮",
-          terminate = "󰝤",
-          disconnect = "󰖪",
+          pause = "⏸",
+          play = "▶",
+          step_into = "⤵",
+          step_over = "⤴", 
+          step_out = "⤴",
+          step_back = "⏮",
+          run_last = "↻",
+          terminate = "⏹",
+          disconnect = "⏏",
         },
       },
       
@@ -100,14 +104,19 @@ return {
         indent = 2,
       },
       
-      -- Floating windows with modern borders
+      -- Floating windows with modern borders and transparency
       floating = {
         max_height = 0.9,
         max_width = 0.9,
-        border = "rounded",
+        border = "rounded", -- "single" | "double" | "rounded" | "solid" | "shadow"
         mappings = {
           close = { "q", "<Esc>" },
         },
+      },
+      
+      -- Window configuration for better visuals
+      windows = { 
+        indent = 1 
       },
       
       -- Expand lines by default
@@ -117,26 +126,22 @@ return {
       force_buffers = true,
     })
 
-    -- Enhanced auto-open/close with better UX
-    local dapui_group = vim.api.nvim_create_augroup("DapuiConfig", { clear = true })
-    
+    -- Auto-open DAP UI when debugging starts
+    -- DAP UI will stay open after debugging ends (manual close with <leader>du)
     dap.listeners.after.event_initialized["dapui_config"] = function()
       dapui.open()
       vim.notify("🐛 Debug session started", vim.log.levels.INFO)
     end
     
+    -- Notify when debugging ends, but keep UI open for inspection
     dap.listeners.before.event_terminated["dapui_config"] = function()
-      vim.notify("🏁 Debug session ended", vim.log.levels.INFO)
-      vim.defer_fn(function()
-        dapui.close()
-      end, 100)
+      vim.notify("🏁 Debug session ended - UI still open for inspection", vim.log.levels.INFO)
+      -- UI stays open - close manually with <leader>du if needed
     end
     
     dap.listeners.before.event_exited["dapui_config"] = function()
-      vim.notify("👋 Debug session exited", vim.log.levels.INFO)
-      vim.defer_fn(function()
-        dapui.close()
-      end, 100)
+      vim.notify("👋 Debug session exited - UI still open for inspection", vim.log.levels.INFO)
+      -- UI stays open - close manually with <leader>du if needed
     end
 
     -- Cool keymaps with better descriptions

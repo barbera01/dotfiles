@@ -59,6 +59,71 @@ vim.keymap.set("n", "<F5>", function()
   require("dap").continue()
 end, { silent = true, desc = "🐛 Start/Continue Debug" })
 
+-- ============================================================================
+-- BETTER ERGONOMIC KEYBINDINGS FOR STEPPING THROUGH CODE
+-- ============================================================================
+-- These are easier to reach than F-keys and more intuitive
+
+-- Continue/Start (easier than F5)
+vim.keymap.set("n", "<leader>dc", function()
+  require("dap").continue()
+end, { silent = true, desc = "▶ Continue/Start" })
+
+-- Step Over - most common operation (super easy to reach)
+vim.keymap.set("n", "<leader>dj", function()
+  require("dap").step_over()
+end, { silent = true, desc = "⤴ Step Over (next line)" })
+
+-- Step Into - go deeper (j/k navigation metaphor)
+vim.keymap.set("n", "<leader>di", function()
+  require("dap").step_into()
+end, { silent = true, desc = "⤵ Step Into (go deeper)" })
+
+-- Step Out - go back up
+vim.keymap.set("n", "<leader>do", function()
+  require("dap").step_out()
+end, { silent = true, desc = "⤴ Step Out (go back)" })
+
+-- Alternative: Use J/K for stepping (even faster!)
+-- Uncomment these if you want super quick stepping
+-- vim.keymap.set("n", "<leader>J", function()
+--   require("dap").step_over()
+-- end, { silent = true, desc = "⤴ Step Over" })
+-- 
+-- vim.keymap.set("n", "<leader>K", function()
+--   require("dap").step_into()
+-- end, { silent = true, desc = "⤵ Step Into" })
+
+-- Continue until cursor (super useful!)
+vim.keymap.set("n", "<leader>dC", function()
+  require("dap").run_to_cursor()
+end, { silent = true, desc = "⏭ Run to Cursor" })
+
+-- Restart debugging session
+vim.keymap.set("n", "<leader>dR", function()
+  require("dap").restart()
+end, { silent = true, desc = "↻ Restart Debug" })
+
+-- Pause execution
+vim.keymap.set("n", "<leader>dp", function()
+  require("dap").pause()
+end, { silent = true, desc = "⏸ Pause" })
+
+-- Step back (if supported by debugger)
+vim.keymap.set("n", "<leader>dk", function()
+  require("dap").step_back()
+end, { silent = true, desc = "⏮ Step Back" })
+
+-- Quick evaluate under cursor
+vim.keymap.set("n", "<leader>dE", function()
+  require("dapui").eval()
+end, { silent = true, desc = "🔍 Eval under cursor" })
+
+-- Evaluate visual selection
+vim.keymap.set("v", "<leader>dE", function()
+  require("dapui").eval()
+end, { silent = true, desc = "🔍 Eval selection" })
+
 
 
 -- Compare / Diff keymaps

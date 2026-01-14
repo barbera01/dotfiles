@@ -1,60 +1,45 @@
+-- LSP Configuration for LazyVim
+-- Note: LazyVim handles most LSP setup automatically
+-- This file is for custom LSP configurations
 return {
-  -- Mason, for automatically installing LSPs
-  {
-    "mason-org/mason.nvim",
-    config = function()
-      require("mason").setup() -- default config
-    end,
-  },
-
-  {
-    "mason-org/mason-lspconfig.nvim",
-    config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "Lua_ls",
-          "pyright",
-          "tsserver",
-          "html",
-          "cssls",
-          "jsonls",
-          "yamlls",
-          "dockerls",
-          "bashls",
-          "vimls",
-          "sumneko_lua",
-          "gopls",
-          "rust_analyzer",
-          "clangd",
-          "svelte",
-          "tailwindcss",
-          "intelephense",
-          "vuels",
-          "graphql",
-          "angularls",
-          "denols",
-          "jdtls",
-          "solargraph",
-          "elixirls",
-          "hls",
-          "cmake",
-          "PowerShell_es",
-          "terraformls",
-          "azure_pipelines_ls",
-        },
-      })
-    end,
-  },
-
-  -- LSPConfig, for configuring individual language servers
   {
     "neovim/nvim-lspconfig",
-    config = function()
-      local lspconfig = require("lspconfig")
-      lspconfig.lua_ls.setup({})
-      lspconfig.PowerShell_es.setup({})
-      lspconfig.terraformls.setup({})
-      lspconfig.azure_pipelines_ls.setup({})
-    end,
+    opts = {
+      servers = {
+        -- Python LSP is configured in lua/plugins/python.lua
+        -- via the LazyVim Python extra
+        
+        -- PowerShell LSP
+        powershell_es = {
+          settings = {
+            powershell = {
+              codeFormatting = {
+                preset = "OTBS",
+              },
+            },
+          },
+        },
+        
+        -- Terraform LSP
+        terraformls = {},
+        
+        -- Azure Pipelines LSP
+        azure_pipelines_ls = {},
+        
+        -- Lua LSP (configured by LazyVim by default)
+        lua_ls = {
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+            },
+          },
+        },
+      },
+    },
   },
 }

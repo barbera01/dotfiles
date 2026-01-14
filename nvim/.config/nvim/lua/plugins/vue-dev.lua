@@ -7,38 +7,25 @@ return {
   -- =========================================================================
   {
     'neovim/nvim-lspconfig',
-    dependencies = {
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
-    },
-    config = function()
-      require('mason').setup()
-      require('mason-lspconfig').setup({
-        ensure_installed = {
-          'ts_ls',      -- TypeScript LSP (required by vue_ls)
-          'volar',      -- Vue LSP (replaces deprecated vetur/vue_ls)
-        },
-      })
-
-      local lspconfig = require('lspconfig')
-
-      -- TypeScript LSP
-      lspconfig.ts_ls.setup({
-        init_options = {
-          plugins = {
-            {
-              name = '@vue/typescript-plugin',
-              location = vim.fn.stdpath('data') .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
-              languages = { 'vue' },
+    opts = {
+      servers = {
+        -- TypeScript LSP (required for Vue)
+        ts_ls = {
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = vim.fn.stdpath('data') .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+                languages = { 'vue' },
+              },
             },
           },
+          filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
         },
-        filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-      })
-
-      -- Vue LSP (modern Volar)
-      lspconfig.volar.setup({})
-    end,
+        -- Vue LSP (Volar)
+        volar = {},
+      },
+    },
   },
 
   -- =========================================================================
@@ -47,48 +34,8 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
-      -- DAP UI
-      {
-        'rcarriga/nvim-dap-ui',
-        dependencies = { 'nvim-neotest/nvim-nio' },
-        config = function()
-          local dap, dapui = require('dap'), require('dapui')
-
-          dapui.setup({
-            layouts = {
-              {
-                elements = {
-                  { id = "scopes", size = 0.30 },
-                  { id = "breakpoints", size = 0.20 },
-                  { id = "stacks", size = 0.30 },
-                  { id = "watches", size = 0.20 },
-                },
-                size = 50,
-                position = "left",
-              },
-              {
-                elements = {
-                  { id = "repl", size = 0.5 },
-                  { id = "console", size = 0.5 },
-                },
-                size = 12,
-                position = "bottom",
-              },
-            },
-          })
-
-          -- Auto-open/close UI
-          dap.listeners.after.event_initialized["dapui_config"] = function()
-            dapui.open()
-          end
-          dap.listeners.before.event_terminated["dapui_config"] = function()
-            dapui.close()
-          end
-          dap.listeners.before.event_exited["dapui_config"] = function()
-            dapui.close()
-          end
-        end,
-      },
+      -- DAP UI is configured in lua/plugins/dap-ui.lua
+      -- No need to configure it here to avoid conflicts
 
       -- Virtual text
       {
