@@ -31,6 +31,18 @@ vim.keymap.set("n", "<F12>", function()
 end, { silent = true, desc = "DAP Step Out" })
 
 -- Additional debugging keymaps
+vim.keymap.set("n", "<leader>dd", function()
+  require("dap").continue()
+end, { desc = "DAP continue (reuse last config)" })
+
+vim.keymap.set("n", "<leader>dd", function()
+  require("dap").run_last()
+end, { desc = "DAP run last (reuse config)" })
+
+vim.keymap.set("n", "<leader>dc", function()
+  require("dap").continue()
+end, { desc = "DAP continue (re-evaluate config)" })
+
 vim.keymap.set("n", "<leader>db", function()
   require("dap").toggle_breakpoint()
 end, { silent = true, desc = "DAP Toggle Breakpoint" })
@@ -72,6 +84,10 @@ vim.keymap.set("n", "<F5>", function()
   end
   require("dap").continue()
 end, { silent = true, desc = "🐛 Start/Continue Debug" })
+
+vim.keymap.set("n", "<leader>~", function()
+  Snacks.dashboard()
+end, { desc = "Dashboard / Home" })
 
 require("which-key").add({
   { "<leader>k", group = "Kubernetes" },
