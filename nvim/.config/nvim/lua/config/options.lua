@@ -3,6 +3,7 @@
 -- Add any additional options here
 vim.g.mapleader = " "
 vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/site")
+vim.opt.clipboard = "unnamedplus"
 
 -- Disable problematic LSP servers in Mason
 vim.g.lazyvim_cmp = "blink.cmp"
