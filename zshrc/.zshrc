@@ -143,3 +143,6 @@ alias python="python3"
 
 # opencode
 export PATH=/Users/andybarber/.opencode/bin:$PATH
+
+# Added by LM Studio CLI tool (lms)
+export PATH="$PATH:/Users/andybarber/.lmstudio/bin"

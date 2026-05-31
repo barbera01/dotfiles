@@ -6,9 +6,10 @@ return {
 
     -- Add your custom group names here
     vim.list_extend(opts.spec, {
-      { "<leader>p", group = "Python" }, -- Rename the p menu to "Python"
-      { "<leader>P", group = "Posting" }, -- Capital P menu for Posting (HTTP client)
-      { "<leader>C", group = "Compare/Diff" }, -- Compare and diff operations
+
+      { "<leader>P", group = "Posting" },
+      { "<leader>C", group = "Compare/Diff" },
+      { "<leader>m", group = "MicroPython" },
     })
 
     return opts

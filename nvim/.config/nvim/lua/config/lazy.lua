@@ -19,6 +19,7 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   spec = {
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    { import = "lazyvim.plugins.extras.lang.python" },
     { import = "plugins" },
   },
   defaults = {
@@ -40,6 +41,3 @@ require("lazy").setup({
     },
   },
 })
-
--- Enable transparency
-vim.cmd("TransparentEnable")

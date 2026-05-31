@@ -1,23 +1,20 @@
 return {
   "rcarriga/nvim-dap-ui",
-  dependencies = { 
+  dependencies = {
     "mfussenegger/nvim-dap",
     "nvim-neotest/nvim-nio",
     "nvim-tree/nvim-web-devicons",
   },
   config = function()
     local dap, dapui = require("dap"), require("dapui")
-    
-    -- Cool modern DAP UI configuration with enhanced visuals
+
     dapui.setup({
-      -- Modern icons with better visual hierarchy
-      icons = { 
-        expanded = "▾", 
-        collapsed = "▸", 
-        current_frame = "→"
+      icons = {
+        expanded = "▾",
+        collapsed = "▸",
+        current_frame = "→",
       },
-      
-      -- Custom mappings
+
       mappings = {
         expand = { "<CR>", "<2-LeftMouse>" },
         open = "o",
@@ -26,155 +23,114 @@ return {
         repl = "r",
         toggle = "t",
       },
-      
-      -- Element mappings for better navigation
+
       element_mappings = {},
-      
-      -- Sleek layout with better proportions
-      -- Using RIGHT position to avoid conflicts with file explorer on the left
+
       layouts = {
         {
-          -- Primary debugging sidebar (on the right to not conflict with explorer)
           elements = {
-            {
-              id = "scopes",
-              size = 0.50, -- 50% - main variable inspection
-            },
-            {
-              id = "watches", 
-              size = 0.25, -- 25% - custom watches
-            },
-            {
-              id = "breakpoints",
-              size = 0.15, -- 15% - breakpoint list
-            },
-            {
-              id = "stacks",
-              size = 0.10, -- 10% - call stack (compact)
-            },
+            { id = "scopes",      size = 0.50 },
+            { id = "watches",     size = 0.25 },
+            { id = "breakpoints", size = 0.15 },
+            { id = "stacks",      size = 0.10 },
           },
-          size = 60, -- Wider sidebar for better readability
-          position = "right", -- Right side to keep explorer on the left
+          size = 60,
+          position = "right",
         },
         {
-          -- Bottom console area
           elements = {
-            {
-              id = "console",
-              size = 1.0, -- Full bottom panel for output
-            },
+            -- For Go/Delve, program stdout/stderr is most useful in the
+            -- terminal pane. The console pane is often empty because it only
+            -- shows DAP adapter output/events, not normal fmt.Println output.
+            { id = "console",  size = 0.10 },
+            { id = "repl",     size = 0.25 },
+            { id = "terminal", size = 0.65 },
           },
-          size = 15, -- Taller console for better visibility
-          position = "bottom",
-        },
-        {
-          -- Floating REPL (activated separately)
-          elements = {
-            {
-              id = "repl",
-              size = 1.0,
-            },
-          },
-          size = 0.3,
+          size = 18,
           position = "bottom",
         },
       },
-      
-      -- Enhanced controls with beautiful modern icons
+
+      -- Controls bar attached to scopes (always visible in layout 1)
       controls = {
         enabled = true,
-        element = "repl",
+        element = "scopes",
         icons = {
           pause = "⏸",
           play = "▶",
           step_into = "⤵",
-          step_over = "⤴", 
-          step_out = "⤴",
+          step_over = "→",
+          step_out = "↑",
           step_back = "⏮",
           run_last = "↻",
           terminate = "⏹",
           disconnect = "⏏",
         },
       },
-      
-      -- Better rendering
+
       render = {
-        max_type_length = 50,
-        max_value_lines = 200,
-        indent = 2,
+        max_type_length = 40,
+        -- Keep values from overflowing the panel height
+        max_value_lines = 3,
+        indent = 1,
       },
       
-      -- Floating windows with modern borders and transparency
       floating = {
         max_height = 0.9,
         max_width = 0.9,
-        border = "rounded", -- "single" | "double" | "rounded" | "solid" | "shadow"
+        border = "rounded",
         mappings = {
           close = { "q", "<Esc>" },
         },
       },
-      
-      -- Window configuration for better visuals
-      windows = { 
-        indent = 1 
-      },
-      
-      -- Expand lines by default
+
+      windows = { indent = 1 },
+
+      -- Allow multi-line values but capped by max_value_lines above
       expand_lines = true,
-      
-      -- Force winbar
-      force_buffers = true,
     })
 
-    -- Auto-open DAP UI when debugging starts
-    -- DAP UI will stay open after debugging ends (manual close with <leader>du)
     dap.listeners.after.event_initialized["dapui_config"] = function()
       dapui.open()
-      vim.notify("🐛 Debug session started", vim.log.levels.INFO)
-    end
-    
-    -- Notify when debugging ends, but keep UI open for inspection
-    dap.listeners.before.event_terminated["dapui_config"] = function()
-      vim.notify("🏁 Debug session ended - UI still open for inspection", vim.log.levels.INFO)
-      -- UI stays open - close manually with <leader>du if needed
-    end
-    
-    dap.listeners.before.event_exited["dapui_config"] = function()
-      vim.notify("👋 Debug session exited - UI still open for inspection", vim.log.levels.INFO)
-      -- UI stays open - close manually with <leader>du if needed
+      vim.notify("Debug session started", vim.log.levels.INFO)
     end
 
-    -- Cool keymaps with better descriptions
-    vim.keymap.set("n", "<leader>du", function()
-      dapui.toggle()
-    end, { desc = "🎛️  Toggle Debug UI" })
-    
-    vim.keymap.set("n", "<leader>dr", function()
-      dapui.toggle({ layout = 3 }) -- Toggle REPL
-    end, { desc = "💬 Toggle Debug REPL" })
-    
-    vim.keymap.set("n", "<leader>de", function()
-      dapui.eval()
-    end, { desc = "🔍 Evaluate Expression" })
-    
-    vim.keymap.set("v", "<leader>de", function()
-      dapui.eval()
-    end, { desc = "🔍 Evaluate Selection" })
-    
-    vim.keymap.set("n", "<leader>df", function()
-      dapui.float_element()
-    end, { desc = "🪟 Float Debug Element" })
-    
-    vim.keymap.set("n", "<leader>dh", function()
-      require('dap.ui.widgets').hover()
-    end, { desc = "📋 Debug Hover Info" })
-    
-    -- Reset layout if it gets messed up
+    dap.listeners.before.event_terminated["dapui_config"] = function()
+      vim.notify("Debug session ended", vim.log.levels.INFO)
+    end
+
+    dap.listeners.before.event_exited["dapui_config"] = function()
+      vim.notify("Debug session exited", vim.log.levels.INFO)
+    end
+
+    local function focus_dap_console()
+      dapui.open({ layout = 2 })
+
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local name = vim.api.nvim_buf_get_name(buf)
+        local ft = vim.bo[buf].filetype
+
+        if ft == "dapui_console" or name:match("DAP Console") then
+          vim.api.nvim_set_current_win(win)
+          vim.cmd("normal! G")
+          return
+        end
+      end
+
+      vim.notify("DAP console is not open yet", vim.log.levels.WARN)
+    end
+
+    vim.keymap.set("n", "<leader>du", function() dapui.toggle() end,                    { desc = "Toggle Debug UI" })
+    vim.keymap.set("n", "<leader>de", function() dapui.eval() end,                      { desc = "Evaluate Expression" })
+    vim.keymap.set("v", "<leader>de", function() dapui.eval() end,                      { desc = "Evaluate Selection" })
+    vim.keymap.set("n", "<leader>df", function() dapui.float_element() end,             { desc = "Float Debug Element" })
+    vim.keymap.set("n", "<leader>dt", focus_dap_console,                                { desc = "Focus Debug Terminal" })
+    vim.keymap.set("n", "<leader>dc", function() dapui.float_element("console") end,    { desc = "Float Debug Console" })
+    vim.keymap.set("n", "<leader>dh", function() require("dap.ui.widgets").hover() end, { desc = "Debug Hover Info" })
     vim.keymap.set("n", "<leader>dR", function()
       dapui.close()
-      vim.defer_fn(function()
-        dapui.open()
-      end, 100)
-    end, { desc = "🔄 Reset Debug Layout" })
+      vim.defer_fn(function() dapui.open() end, 100)
+    end, { desc = "Reset Debug Layout" })
   end,
 }

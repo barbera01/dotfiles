@@ -12,6 +12,7 @@ return {
         },
         exclude = {}  -- Exclude groups from transparency if needed
       })
+      vim.cmd("TransparentEnable")
     end
   }
 }

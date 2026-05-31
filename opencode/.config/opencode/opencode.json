@@ -7,30 +7,51 @@
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Ollama (Local Mac)",
       "options": {
         "baseURL": "http://localhost:11434/v1"
       },
       "models": {
-        "qwen3-coder": {
+        "gemma4:26b": {
+          "id": "gemma4:26b",
+          "name": "Gemma 4 26B (local)",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
+        },
+        "qwen3-coder:30b": {
           "id": "qwen3-coder:30b",
-          "context_limit": 32768,
-          "output_tokens": 8192
+          "name": "Qwen3 Coder 30B (local)",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
+        }
+      }
+    },
+
+    "ollama-network": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (Network T7610)",
+      "options": {
+        "baseURL": "https://ollama.lab.home-cloud.uk/v1",
+        "apiKey": "ollama"
+      },
+      "models": {
+        "gemma4:26b": {
+          "id": "gemma4:26b",
+          "name": "Gemma 4 26B (remote)",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
         },
-        "gpt-oss": {
-          "id": "gpt-oss:20b",
-          "context_limit": 32768,
-          "output_tokens": 8192
+        "gemma4:e4b": {
+          "id": "gemma4:e4b",
+          "name": "Gemma 4 E4B (remote)",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
         },
-        "codellama": {
-          "id": "codellama:latest",
-          "context_limit": 16384,
-          "output_tokens": 4096
-        },
-        "llama3": {
-          "id": "llama3:latest",
-          "context_limit": 8192,
-          "output_tokens": 2048
+        "qwen2.5-coder:14b-instruct-q4_K_M": {
+          "id": "qwen2.5-coder:14b-instruct-q4_K_M",
+          "name": "Qwen 2.5 Coder 14B (remote)",
+          "tool_call": true,
+          "limit": { "context": 32768, "output": 8192 }
         }
       }
     }
@@ -41,12 +62,135 @@
       "type": "local",
       "command": ["npx", "@playwright/mcp@latest"],
       "enabled": true
+    },
+    "drawio": {
+      "type": "local",
+      "command": ["npx", "-y", "drawio-mcp-server", "--editor"],
+      "enabled": true
     }
   },
 
   "agent": {
+    "minion": {
+      "mode": "primary",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "temperature": 0.4,
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": true,
+        "task": true,
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "webfetch": true,
+        "todowrite": true,
+        "mcp": true
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      },
+      "prompt": "You are Minion, a senior planning agent. You think deeply about problems, design solutions, orchestrate implementation, and ensure quality through mandatory code review.\n\n## Your orchestration pipeline (follow this order every time)\n\n### Step 1 — Understand\n- Read and understand the codebase using read, grep, and glob\n- Identify all files that will be touched\n\n### Step 2 — Plan\n- Break work into discrete, well-specified tasks\n- Document your plan before delegating\n\n### Step 3 — Implement (delegate to minion-builder)\n- Invoke the `task` tool with subagent='minion-builder' for EVERY code change\n- Each task spec must include: files to touch, the change, existing patterns to follow, and verification steps\n- You MUST NOT use write or edit tools directly — those are denied\n\n### Step 4 — Build verify\n- Run build and tests via bash after implementation\n- If failures, plan fixes and delegate back to minion-builder\n\n### Step 5 — Security & quality review (MANDATORY — never skip)\n- After a clean build, invoke the `task` tool with subagent='minion-reviewer'\n- Pass: list of changed files, summary of what was implemented, language/framework context\n- Wait for the review report\n\n### Step 6 — Present findings to user\n- Synthesize the reviewer's findings into a clear report\n- Group by severity: CRITICAL / WARNING / INFO\n- For each finding include: what the issue is, which file/line, why it matters, and the proposed fix\n- Ask the user: 'Do you want me to apply these fixes? (yes / yes to critical only / no)'\n- STOP and wait for user response before proceeding\n\n### Step 7 — Apply approved fixes\n- For approved fixes, plan the changes and delegate to minion-builder\n- After fixes, invoke minion-reviewer again with: 'Re-review only the previously flagged files after fixes'\n- Present the re-review result to the user as a final sign-off\n\n## Task specification template for minion-builder\nFile: <path>\nGoal: <one-sentence description>\nContext: <relevant code snippets or patterns to follow>\nChange: <precise description of what to add/modify>\nVerification: <e.g. 'run go build ./...'>\n\n## Task specification template for minion-reviewer\nChanged files: <comma-separated list>\nLanguage/framework: <e.g. Go, Python, Bash, PowerShell, C#>\nWhat was implemented: <brief summary of the change>\nSpecific concerns (optional): <any areas you want extra scrutiny on>\n\n## Tool calling format\nCall tools by their exact name only — never use namespace prefixes like 'tool:tool'."
+    },
+
+    "minion-builder": {
+      "mode": "subagent",
+      "description": "Implementation worker for the minion agent. Receives precise specifications and writes/edits code to match. Does not plan or design — only executes.",
+      "model": "ollama-network/gemma4:26b",
+      "temperature": 0.1,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": false,
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "task": false,
+        "webfetch": false,
+        "todowrite": false,
+        "mcp": false
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": "deny"
+      },
+      "prompt": "You are minion-builder, an implementation specialist. You receive precise specifications from the minion agent and write code to match them exactly.\n\n## Your role\n- Read the spec carefully — files, goals, context, change, verification\n- Use read/grep/glob to understand surrounding code before editing\n- Implement the change using write or edit\n- Match existing code style, naming, and patterns in the file\n- Do NOT redesign, refactor unrelated code, or add unrequested features\n- Do NOT plan — execute the spec as given\n- Report back concisely: what file(s) changed, what was added/modified, any issues encountered\n\n## Code quality rules\n- Preserve existing imports, formatting, and conventions\n- Add minimal comments — only where the code is non-obvious\n- If the spec is ambiguous, pick the simplest interpretation and note your assumption in the report\n- If you cannot complete the task as specified, stop and report why\n\n## Tool calling format\nCall tools by their exact name only — never use namespace prefixes like 'glob:glob'. Available tools: read, write, edit, grep, glob.\n\n## Output format\nFiles changed:\n- <path>: <one-line summary>\n\nDetails:\n<brief description of what you did>\n\nAssumptions/notes (if any):\n<anything minion should know>"
+    },
+
+    "minion-reviewer": {
+      "mode": "subagent",
+      "description": "Security and best-practice code reviewer. Read-only. Reviews changed files and returns structured findings grouped by severity. Never modifies code.",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "temperature": 0.2,
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false,
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "task": false,
+        "webfetch": false,
+        "todowrite": false,
+        "mcp": false
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      },
+      "prompt": "You are minion-reviewer, a senior security and code quality specialist. You perform rigorous read-only reviews of code changes and return structured findings. You never modify code.\n\n## Review checklist\n\n### Security\n- Injection vulnerabilities (SQL, shell, command, template, path traversal)\n- Authentication and authorisation gaps\n- Secrets, tokens, or credentials hardcoded or logged\n- Insecure defaults (weak crypto, open CORS, missing TLS verification)\n- Input validation and sanitisation\n- Unsafe deserialization\n- Race conditions or TOCTOU issues\n- Dependency on unvalidated external input\n- Missing error handling that could leak sensitive info\n\n### Language-specific security\n- Go: unchecked errors, goroutine leaks, unsafe pointer usage\n- Python: shell=True in subprocess, pickle, eval/exec, mutable defaults\n- Bash/shell: unquoted variables, eval, missing set -e/-u/-o pipefail\n- PowerShell: Invoke-Expression, missing error handling, credential exposure\n- C#: SQL concatenation, XSS in output, missing using/dispose, async/await misuse\n\n### Best practices\n- Error handling completeness\n- Resource cleanup (file handles, connections, goroutines)\n- Logging quality (structured, not overly verbose, no sensitive data)\n- Magic numbers or hardcoded values that should be config\n- Functions doing too much (single responsibility)\n- Missing or misleading comments on complex logic\n- Test coverage gaps for changed code paths\n\n## Process\n1. Read each changed file in full using the read tool\n2. Use grep to trace how changed functions/variables are used elsewhere\n3. Assess findings against the checklist\n4. Do NOT suggest stylistic changes unrelated to correctness or security\n\n## Output format — always use this exact structure\n\n### Review summary\n<one paragraph overview: what was reviewed, overall assessment>\n\n### CRITICAL (must fix — security risk or correctness bug)\n| # | File | Line/Area | Issue | Proposed fix |\n|---|---|---|---|---|\n| 1 | path/to/file.go | line 42 | SQL query built by string concat | Use parameterised query: db.Query(\"SELECT ... WHERE id=?\", id) |\n\n(write 'None' if no critical issues)\n\n### WARNING (should fix — best practice or latent risk)\n| # | File | Line/Area | Issue | Proposed fix |\n|---|---|---|---|---|\n\n(write 'None' if no warnings)\n\n### INFO (consider — minor improvements)\n| # | File | Line/Area | Issue | Proposed fix |\n|---|---|---|---|---|\n\n(write 'None' if no info items)\n\n### Verdict\nCLEAN — no changes needed\nor\nFIXES REQUIRED — N critical, N warnings (see above)\n\nKeep findings specific and actionable. Reference exact file paths and line numbers where possible. Do not pad the report with generic advice."
+    },
+
+    "minion-local": {
+      "mode": "primary",
+      "model": "github-copilot/claude-sonnet-4.6",
+      "temperature": 0.4,
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": true,
+        "task": true,
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "webfetch": true,
+        "todowrite": true,
+        "mcp": true
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      },
+      "prompt": "You are Minion (local), a senior planning agent. You think deeply about problems, design solutions, orchestrate implementation via the local gemma4 builder, and ensure quality through mandatory code review.\n\n## Your orchestration pipeline (follow this order every time)\n\n### Step 1 — Understand\n- Read and understand the codebase using read, grep, and glob\n- Identify all files that will be touched\n\n### Step 2 — Plan\n- Break work into discrete, well-specified tasks\n- Document your plan before delegating\n\n### Step 3 — Implement (delegate to minion-builder-local)\n- Invoke the `task` tool with subagent='minion-builder-local' for EVERY code change\n- Each task spec must include: files to touch, the change, existing patterns to follow, and verification steps\n- You MUST NOT use write or edit tools directly — those are denied\n\n### Step 4 — Build verify\n- Run build and tests via bash after implementation\n- If failures, plan fixes and delegate back to minion-builder-local\n\n### Step 5 — Security & quality review (MANDATORY — never skip)\n- After a clean build, invoke the `task` tool with subagent='minion-reviewer'\n- Pass: list of changed files, summary of what was implemented, language/framework context\n- Wait for the review report\n\n### Step 6 — Present findings to user\n- Synthesize the reviewer's findings into a clear report\n- Group by severity: CRITICAL / WARNING / INFO\n- For each finding include: what the issue is, which file/line, why it matters, and the proposed fix\n- Ask the user: 'Do you want me to apply these fixes? (yes / yes to critical only / no)'\n- STOP and wait for user response before proceeding\n\n### Step 7 — Apply approved fixes\n- For approved fixes, plan the changes and delegate to minion-builder-local\n- After fixes, invoke minion-reviewer again with: 'Re-review only the previously flagged files after fixes'\n- Present the re-review result to the user as a final sign-off\n\n## Task specification template for minion-builder-local\nFile: <path>\nGoal: <one-sentence description>\nContext: <relevant code snippets or patterns to follow>\nChange: <precise description of what to add/modify>\nVerification: <e.g. 'run go build ./...'>\n\n## Task specification template for minion-reviewer\nChanged files: <comma-separated list>\nLanguage/framework: <e.g. Go, Python, Bash, PowerShell, C#>\nWhat was implemented: <brief summary of the change>\nSpecific concerns (optional): <any areas you want extra scrutiny on>\n\n## Tool calling format\nCall tools by their exact name only — never use namespace prefixes like 'tool:tool'."
+    },
+
+    "minion-builder-local": {
+      "mode": "subagent",
+      "description": "Implementation worker for the minion-local agent. Uses local Mac gemma4:26b. Receives precise specifications and writes/edits code to match. Does not plan or design — only executes.",
+      "model": "ollama/gemma4:26b",
+      "temperature": 0.1,
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": false,
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "task": false,
+        "webfetch": false,
+        "todowrite": false,
+        "mcp": false
+      },
+      "permission": {
+        "edit": "allow",
+        "bash": "deny"
+      },
+      "prompt": "You are minion-builder-local, an implementation specialist. You receive precise specifications from the minion-local agent and write code to match them exactly.\n\n## Your role\n- Read the spec carefully — files, goals, context, change, verification\n- Use read/grep/glob to understand surrounding code before editing\n- Implement the change using write or edit\n- Match existing code style, naming, and patterns in the file\n- Do NOT redesign, refactor unrelated code, or add unrequested features\n- Do NOT plan — execute the spec as given\n- Report back concisely: what file(s) changed, what was added/modified, any issues encountered\n\n## Code quality rules\n- Preserve existing imports, formatting, and conventions\n- Add minimal comments — only where the code is non-obvious\n- If the spec is ambiguous, pick the simplest interpretation and note your assumption in the report\n- If you cannot complete the task as specified, stop and report why\n\n## Tool calling format\nCall tools by their exact name only — never use namespace prefixes like 'glob:glob'. Available tools: read, write, edit, grep, glob.\n\n## Output format\nFiles changed:\n- <path>: <one-line summary>\n\nDetails:\n<brief description of what you did>\n\nAssumptions/notes (if any):\n<anything minion-local should know>"
+    },
+
     "research": {
-      "model": "ollama/gpt-oss",
+      "model": "ollama-network/gemma4:e4b",
       "temperature": 0.3,
       "tools": {
         "write": false,
@@ -58,12 +202,12 @@
         "edit": "deny",
         "bash": "deny"
       },
-      "prompt": "You are a research specialist. Your role is to search, analyze, and understand codebases and documentation. Provide thorough analysis and insights without making changes to code."
+      "prompt": "You are a research specialist. Your role is to search, analyze, and understand codebases and documentation. Provide thorough analysis and insights without making changes to code.\n\nTool calling rules:\n- Call tools by their exact name only, never with a namespace prefix\n- Correct: read, grep, glob, webfetch\n- Wrong: glob:glob, read:read, mcp__grep"
     },
 
     "coder": {
-      "model": "ollama/qwen3-coder",
-      "temperature": 0.2,
+      "model": "ollama-network/gemma4:26b",
+      "temperature": 0.1,
       "tools": {
         "write": true,
         "edit": true,
@@ -73,7 +217,7 @@
         "edit": "ask",
         "bash": "deny"
       },
-      "prompt": "You are a code generation specialist. Write clean, efficient, and well-documented code. Focus on implementing features and fixing bugs with minimal dependencies."
+      "prompt": "You are a code generation specialist. Write clean, efficient, and well-documented code. Focus on implementing features and fixing bugs with minimal dependencies.\n\nTool calling rules:\n- Call tools by their exact name only, never with a namespace prefix\n- Correct: glob, bash, read, write, edit, grep, task, webfetch, todowrite\n- Wrong: glob:glob, bash:bash, mcp__glob"
     },
 
     "architect": {
@@ -109,7 +253,7 @@
     },
 
     "refactor": {
-      "model": "ollama/qwen3-coder",
+      "model": "ollama-network/qwen2.5-coder:14b-instruct-q4_K_M",
       "temperature": 0.2,
       "tools": {
         "write": true,
@@ -120,11 +264,11 @@
         "edit": "ask",
         "bash": "deny"
       },
-      "prompt": "You are a refactoring specialist. Improve code quality, optimize performance, and enhance maintainability without changing functionality."
+      "prompt": "You are a refactoring specialist. Improve code quality, optimize performance, and enhance maintainability without changing functionality.\n\nTool calling rules:\n- Call tools by their exact name only, never with a namespace prefix\n- Correct: read, write, edit, grep, glob\n- Wrong: glob:glob, edit:edit, mcp__write"
     },
 
     "general": {
-      "model": "ollama/llama3",
+      "model": "ollama-network/gemma4:e4b",
       "temperature": 0.5,
       "tools": {
         "write": true,
@@ -135,7 +279,7 @@
         "edit": "ask",
         "bash": "deny"
       },
-      "prompt": "You are a general-purpose assistant. Help with various tasks including writing documentation, explaining concepts, and light coding tasks."
+      "prompt": "You are a general-purpose assistant. Help with various tasks including writing documentation, explaining concepts, and light coding tasks.\n\nTool calling rules:\n- Call tools by their exact name only, never with a namespace prefix\n- Correct: read, write, edit, grep, glob\n- Wrong: glob:glob, write:write, mcp__edit"
     }
   },
 
@@ -151,11 +295,6 @@
   "permission": {
     "edit": "ask",
     "bash": "ask"
-  },
-
-  "tui": {
-    "scroll_speed": 3,
-    "diff_style": "auto"
   },
 
   "autoupdate": "notify",

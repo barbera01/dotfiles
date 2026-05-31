@@ -1,9 +1,6 @@
 -- Import LazyVim's Python language extra for complete Python support
 -- This provides: treesitter, LSP (pyright + ruff), DAP debugging, and testing
 return {
-  -- Import the LazyVim Python extra which sets up everything
-  { import = "lazyvim.plugins.extras.lang.python" },
-
   -- Override/extend the Python LSP configuration if needed
   {
     "neovim/nvim-lspconfig",
