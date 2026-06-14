@@ -49,6 +49,8 @@ config.hide_mouse_cursor_when_typing = true
 -- Environment / Terminal
 config.term = "xterm-256color"
 
+-- Key handling
+
 -- Disable tab bar for cleaner look (optional, uncomment if desired)
 -- config.enable_tab_bar = false
 

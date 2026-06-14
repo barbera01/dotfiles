@@ -90,6 +90,31 @@ return {
       expand_lines = true,
     })
 
+    -- Colourful per-panel separators so each dap-ui pane stands out
+    local dapui_border_colors = {
+      dapui_scopes      = "#61afef", -- blue
+      dapui_breakpoints = "#e06c75", -- red
+      dapui_stacks      = "#d19a66", -- orange
+      dapui_watches     = "#c678dd", -- purple
+      dapui_console     = "#56b6c2", -- cyan
+      dapui_repl        = "#98c379", -- green
+    }
+
+    for ft, color in pairs(dapui_border_colors) do
+      vim.api.nvim_set_hl(0, "DapUIWinSeparator_" .. ft, { fg = color })
+    end
+
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = vim.tbl_keys(dapui_border_colors),
+      callback = function(args)
+        local win = vim.fn.bufwinid(args.buf)
+        vim.wo[win].winhighlight = "WinSeparator:DapUIWinSeparator_" .. args.match
+        -- Use solid blocks instead of thin lines so separators stay visible
+        -- against a transparent terminal background
+        vim.wo[win].fillchars = "vert:█,horiz:▄,horizup:█,horizdown:█,vertleft:█,vertright:█,verthoriz:█"
+      end,
+    })
+
     dap.listeners.after.event_initialized["dapui_config"] = function()
       dapui.open()
       vim.notify("Debug session started", vim.log.levels.INFO)
