@@ -41,6 +41,12 @@ return {
   opts = {
     keymap = { preset = "super-tab" },
 
+    -- Allow disabling the completion popup per-buffer (`:lua vim.b.completion = false`)
+    -- or globally (`vim.g.completion = false`).
+    enabled = function()
+      return vim.g.completion ~= false and vim.b.completion ~= false
+    end,
+
     completion = {
       documentation = {
         auto_show = false,
@@ -48,13 +54,15 @@ return {
     },
 
     sources = {
-      default = {
-        "lsp",
-        "path",
-        "snippets",
-        "buffer",
-        -- "minuet", for local LLM Completion
-      },
+      -- Leet mode (vim.g.leetmode) drops the AI source while keeping the LSP
+      -- popup; toggle it with <leader>ul or :LeetMode (see keymaps.lua).
+      default = function()
+        local srcs = { "lsp", "path", "snippets", "buffer" }
+        if not vim.g.leetmode then
+          -- table.insert(srcs, "minuet") -- enable for local LLM completion
+        end
+        return srcs
+      end,
 
       providers = {
         minuet = {

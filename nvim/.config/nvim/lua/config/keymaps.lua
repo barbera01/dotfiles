@@ -244,3 +244,24 @@ vim.keymap.set("n", "<leader>Ca", function()
     end,
   })
 end, { desc = "Compare 2 open buffers (vimdiff)" })
+
+-- ============================================================================
+-- LEET MODE: disable AI assistance (Copilot ghost text + local-LLM source)
+-- while keeping the LSP completion popup (blink with lsp/path/snippets/buffer).
+-- ============================================================================
+local function toggle_leetmode()
+  vim.g.leetmode = not vim.g.leetmode
+  local on = vim.g.leetmode
+  -- Copilot ghost text
+  pcall(vim.cmd, on and "Copilot disable" or "Copilot enable")
+  -- blink.cmp's `sources.default` reads vim.g.leetmode to drop the AI ("minuet")
+  -- source while leaving lsp/path/snippets/buffer intact (see blinkcmp.lua).
+  vim.cmd("redrawstatus") -- refresh the lualine indicator immediately
+  vim.notify(
+    on and "Leet mode ON — AI disabled, LSP still active" or "Leet mode OFF — AI re-enabled",
+    vim.log.levels.INFO
+  )
+end
+
+vim.api.nvim_create_user_command("LeetMode", toggle_leetmode, { desc = "Toggle leet mode (disable AI, keep LSP)" })
+vim.keymap.set("n", "<leader>ul", toggle_leetmode, { desc = "Toggle leet mode (disable AI, keep LSP)" })

@@ -26,6 +26,10 @@ return {
 
       element_mappings = {},
 
+      -- Single RIGHT-side inspector panel only. The bottom is intentionally
+      -- left free for the interactive dlv terminal opened by <leader>dg, so the
+      -- two don't fight (that overlap was the "UI mess"). The repl/console can
+      -- still be floated on demand: <leader>dfc (console) / <leader>dfr (repl).
       layouts = {
         {
           elements = {
@@ -36,18 +40,6 @@ return {
           },
           size = 60,
           position = "right",
-        },
-        {
-          elements = {
-            -- For Go/Delve, program stdout/stderr is most useful in the
-            -- terminal pane. The console pane is often empty because it only
-            -- shows DAP adapter output/events, not normal fmt.Println output.
-            { id = "console",  size = 0.10 },
-            { id = "repl",     size = 0.25 },
-            { id = "terminal", size = 0.65 },
-          },
-          size = 18,
-          position = "bottom",
         },
       },
 
@@ -151,7 +143,11 @@ return {
     vim.keymap.set("v", "<leader>de", function() dapui.eval() end,                      { desc = "Evaluate Selection" })
     vim.keymap.set("n", "<leader>df", function() dapui.float_element() end,             { desc = "Float Debug Element" })
     vim.keymap.set("n", "<leader>dt", focus_dap_console,                                { desc = "Focus Debug Terminal" })
-    vim.keymap.set("n", "<leader>dc", function() dapui.float_element("console") end,    { desc = "Float Debug Console" })
+    -- NB: <leader>dc is DAP Continue (config/keymaps.lua). Float-console moved to
+    -- <leader>dfc so it no longer shadows Continue (that shadowing made debug
+    -- sessions look frozen — the program never continued past entry).
+    vim.keymap.set("n", "<leader>dfc", function() dapui.float_element("console") end,   { desc = "Float Debug Console" })
+    vim.keymap.set("n", "<leader>dfr", function() dapui.float_element("repl") end,      { desc = "Float Debug REPL" })
     vim.keymap.set("n", "<leader>dh", function() require("dap.ui.widgets").hover() end, { desc = "Debug Hover Info" })
     vim.keymap.set("n", "<leader>dR", function()
       dapui.close()
