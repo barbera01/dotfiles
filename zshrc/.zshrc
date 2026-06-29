@@ -1,17 +1,25 @@
 
+# --- WSL Windows user (used by freelens, kube-sync-win, etc.) ---
+WIN_USER="${WIN_USER:-AndyBarber}"
+WIN_HOME="/mnt/c/Users/$WIN_USER"
+
 if [ -f "$HOME/.zshrc-env-sec" ]; then
   source "$HOME/.zshrc-env-sec"
 fi
 
 # --- Oh My Zsh setup ---
-export ZSH="$HOME/.oh-my-posh"
 export ZSH="$HOME/.oh-my-zsh"
 
-ZSH_THEME="robbyrussell"
+ZSH_THEME=""  # Oh My Posh controls the prompt; skip OMZ theme loading
 
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
+
+# --- Modular config (loaded after OMZ so functions/completions are available) ---
+for file in "$HOME/.config/zsh/"*.zsh; do
+  source "$file"
+done
 
 # --- Modern PATH management ---
 # Use zsh deduplication
@@ -21,10 +29,6 @@ typeset -U PATH
 PATH="$HOME/.local/bin:$PATH"
 PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 PATH="$HOME/.tfenv/bin:$PATH"
-PATH="$HOME/.tfenv/bin:$PATH"
-PATH="$HOME/.tfenv/bin:$PATH"
-PATH="$HOME/.tfenv/bin:$PATH"
-PATH="$HOME/.tfenv/bin:$PATH"
 
 # Go
 PATH="/usr/local/go/bin:$PATH"
@@ -33,19 +37,34 @@ PATH="$HOME/go/bin:$PATH"
 # Neovim
 PATH="/opt/nvim-linux-x86_64/bin:$PATH"
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+# .NET
+export DOTNET_ROOT="$HOME/.dotnet"
+PATH="$HOME/.dotnet:$PATH"
 
-# Terraform env manager
-PATH="$HOME/.tfenv/bin:$PATH"
+# Development tooling
+PATH="$HOME/.opencode/bin:$PATH"
+
+# NVM (lazy-loaded to avoid ~300ms shell startup penalty)
+export NVM_DIR="$HOME/.nvm"
+_lazy_nvm() {
+  unset -f nvm node npm npx
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+}
+nvm()  { _lazy_nvm; nvm "$@"; }
+node() { _lazy_nvm; node "$@"; }
+npm()  { _lazy_nvm; npm "$@"; }
+npx()  { _lazy_nvm; npx "$@"; }
 
 export PATH
 
-# --- Oh My Posh prompt ---
-# This controls your shell PROMPT theme
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/cloud-native-azure.omp.json)"
+# --- Starship prompt ---
+# This controls your shell PROMPT theme (cloud-native Azure theme).
+# Config: ~/.config/starship.toml
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+eval "$(starship init zsh)"
+
+
 
 # --- eza integration ---
 # Make file listings match tmux Catppuccin mocha flavor
@@ -67,7 +86,7 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
 fi
 
 posting() {
-  local COLLECTION_DIR="${POSTING_COLLECTION_DIR:-/home/andy/repos/aba-sorted-github/Posting-Collections}"
+  local COLLECTION_DIR="${POSTING_COLLECTION_DIR:-$HOME/repos/aba-sorted-github/Posting-Collections}"
 
   command posting \
     --collection "$COLLECTION_DIR" \
@@ -79,7 +98,7 @@ posting() {
 # --- Launch Freelens from WSL tmux panes ---
 
 freelens() {
-  local exe="/mnt/c/Users/AndyBarber/AppData/Local/Programs/Freelens/Freelens.exe"
+  local exe="$WIN_HOME/AppData/Local/Programs/Freelens/Freelens.exe"
   powershell.exe -NoProfile -NonInteractive -Command \
     "Start-Process '$(wslpath -w "$exe")'" \
     >/dev/null 2>&1 </dev/null & disown
@@ -178,6 +197,7 @@ az-ctx() {
       az login --use-device-code || return 1
     fi
   fi
+  clear
 }
 
 # --- Azure Subscription selector (numbered TSV list) ---
@@ -245,16 +265,13 @@ az-sub() {
   local sub_id="${sub_ids[$choice]}"
   az account set --subscription "$sub_id" || return 1
   echo "Active subscription set to: ${sub_names[$choice]} ($sub_id)"
+
 }
 
 # --- Auto prompt for Azure context when inside tmux ---
 if [[ -n "${TMUX:-}" && -z "${AZURE_CONFIG_DIR:-}" && -t 0 ]]; then
   az-ctx
 fi
-
-export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$HOME/.dotnet:$PATH
-
 
 # -- Kubernetes ---
 alias kubectl-clear='kubectl config unset current-context'
@@ -289,7 +306,7 @@ kube-sync-win() {
     return 1
   fi
 
-  local win_kube_dir="/mnt/c/Users/AndyBarber/.kube"
+  local win_kube_dir="$WIN_HOME/.kube"
   local dst="$win_kube_dir/${src:t}"
 
   mkdir -p "$win_kube_dir" || return 1
@@ -328,17 +345,59 @@ unsrcenv() {
   fi
 
   # Extract variable names and unset them
-  grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$env_file" |
-    cut -d= -f1 |
-    while read -r var; do
-      unset "$var"
-    done
+  local -a vars=("${(@f)$(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$env_file" | cut -d= -f1)}")
+  local var
+  for var in "${vars[@]}"; do
+    unset "$var"
+  done
 }
 
-# --- Development tooling ---
-export PATH="/home/andy/.opencode/bin:$PATH"
-export PATH="/home/andy/.tfenv/bin:$PATH"
+bw-unlock() {
+  # Ensure we’re pointed at your Vaultwarden
+  bw config server https://vault.andybarber.dev >/dev/null
+
+  # If already unlocked, reuse the session
+  if bw status 2>/dev/null | jq -e '.status=="unlocked"' >/dev/null; then
+    echo "Bitwarden already unlocked ✅"
+    return 0
+  fi
+
+  # Prompt for master password (hidden)
+  unset BW_PASSWORD
+  echo -n "Bitwarden master password: "
+  read -rs BW_PASSWORD
+  echo
+  export BW_PASSWORD
+
+  # Login with API key if needed
+  if ! bw status | jq -e '.status!="unauthenticated"' >/dev/null; then
+    bw login --apikey --raw >/dev/null
+  fi
+
+  # Unlock and capture session
+  export BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw)"
+
+  # Clear master password from environment immediately
+  unset BW_PASSWORD
+
+  # Optional but recommended
+  bw sync >/dev/null
+
+  echo "Vault unlocked 🔓"
+}
+alias podman=podman.exe
+export BROWSER="/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 
 # --- HackerRank / interview prep helpers (optional) ---
 alias tmuxconfig='${EDITOR:-nvim} ~/.tmux.conf'
 alias zshreload='source ~/.zshrc && echo "zshrc reloaded"'
+
+export PATH="$PATH:$(go env GOPATH)/bin"
+export PATH="$PATH:/snap/bin"
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$PATH:/opt/mssql-tools18/bin"
+
+
+
+export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '/mnt/c/Users/AndyBarber/AppData/Roaming/npm' | paste -sd:)

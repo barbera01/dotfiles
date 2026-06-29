@@ -7,6 +7,14 @@ return {
   },
   config = function()
     local dap = require("dap")
+    
+    -- Configure how DAP opens integrated terminals
+    dap.defaults.fallback.external_terminal = {
+      command = '/usr/bin/env';
+      args = {'bash'};
+    }
+    
+    dap.defaults.fallback.force_external_terminal = false
 
     -- Modern DAP signs with better icons (from dap-styling)
     vim.fn.sign_define("DapBreakpoint", {
@@ -115,26 +123,53 @@ return {
     vim.api.nvim_set_hl(0, "DapUICollapseOne", { fg = "#00d7ff" })
     vim.api.nvim_set_hl(0, "DapUICollapse", { fg = "#00d7ff" })
 
-    -- === PowerShell Configuration ===
-    -- Note: PowerShell debugging in nvim-dap is limited. Consider using VS Code for full PowerShell debugging.
-    -- This configuration will disable PowerShell DAP for now.
-    -- Uncomment and configure properly if you have a working PowerShell debug adapter.
-    
-    -- dap.adapters.powershell = {
-    --   type = "executable",
-    --   command = "pwsh",
-    --   args = { "-Command", "-" }
-    -- }
-    
-    -- dap.configurations.ps1 = {
-    --   {
-    --     type = "powershell",
-    --     request = "launch",
-    --     name = "Launch PowerShell script",
-    --     script = "${file}",
-    --     cwd = "${workspaceFolder}",
-    --   },
-    -- }
+    -- === PowerShell Configuration (via PowerShell Editor Services) ===
+    local pses_bundle = vim.fn.expand("~/.local/share/nvim/dap-adapters/powershell-es")
+    local pses_script = pses_bundle .. "/PowerShellEditorServices/Start-EditorServices.ps1"
+
+    dap.adapters.powershell = {
+      type = "pipe",
+      pipe = "${pipe}",
+      executable = {
+        command = "pwsh",
+        args = {
+          "-NoLogo",
+          "-NoProfile",
+          pses_script,
+          "-BundledModulesPath", pses_bundle,
+          "-SessionDetailsPath", pses_bundle .. "/session.json",
+          "-LogPath", pses_bundle .. "/logs.log",
+          "-LogLevel", "Normal",
+          "-DebugServiceOnly",
+          "-DebugServicePipeName", "${pipe}",
+        },
+      },
+    }
+
+    local powershell_config = {
+      {
+        type = "powershell",
+        request = "launch",
+        name = "Launch PowerShell Script",
+        script = "${file}",
+        cwd = "${workspaceFolder}",
+      },
+      {
+        type = "powershell",
+        request = "launch",
+        name = "Launch PowerShell Script (with args)",
+        script = "${file}",
+        cwd = "${workspaceFolder}",
+        args = function()
+          local input = vim.fn.input("Arguments: ")
+          return vim.split(input, " ", { trimempty = true })
+        end,
+      },
+    }
+
+    dap.configurations.ps1 = powershell_config
+    dap.configurations.powershell = powershell_config
+    dap.configurations.psm1 = powershell_config
 
     -- === Go Configuration ===
     dap.adapters.go = {
@@ -196,43 +231,90 @@ return {
         type = "bashdb",
         request = "launch",
         name = "Launch Bash script",
-        showDebugOutput = true,
+        showDebugOutput = false,
         pathBashdb = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
         pathBashdbLib = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir",
-        trace = true,
+        trace = false,
         file = "${file}",
         program = "${file}",
         cwd = "${workspaceFolder}",
         pathCat = "cat",
-        pathBash = "/opt/homebrew/bin/bash",
+        pathBash = "/usr/bin/bash",
         pathMkfifo = "mkfifo",
         pathPkill = "pkill",
         args = {},
+        argsString = "",
         env = {},
         terminalKind = "integrated",
       },
       {
         type = "bashdb",
-        request = "launch", 
+        request = "launch",
         name = "Launch Bash script with args",
-        showDebugOutput = true,
+        showDebugOutput = false,
         pathBashdb = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
         pathBashdbLib = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir",
-        trace = true,
+        trace = false,
         file = "${file}",
         program = "${file}",
         cwd = "${workspaceFolder}",
         pathCat = "cat",
-        pathBash = "/opt/homebrew/bin/bash",
-        pathMkfifo = "mkfifo", 
+        pathBash = "/usr/bin/bash",
+        pathMkfifo = "mkfifo",
         pathPkill = "pkill",
-        args = function()
-          return vim.split(vim.fn.input("Arguments: ", ""), " ")
+        args = {},
+        argsString = function()
+          return vim.fn.input("Arguments: ", "")
         end,
         env = {},
         terminalKind = "integrated",
       },
+      {
+        type = "bashdb",
+        request = "launch",
+        name = "Debug: update-service-connection (argsString)",
+        showDebugOutput = false,
+        pathBashdb = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
+        pathBashdbLib = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir",
+        trace = false,
+        file = "${workspaceFolder}/support-scripts/update-service-connection-description.sh",
+        program = "${workspaceFolder}/support-scripts/update-service-connection-description.sh",
+        cwd = "${workspaceFolder}",
+        pathCat = "cat",
+        pathBash = "/usr/bin/bash",
+        pathMkfifo = "mkfifo",
+        pathPkill = "pkill",
+        args = {},
+        argsString = '--connection-name "Dev-Pipelines" --project "terramate" --org "https://dev.azure.com/ADVW" --debug',
+        env = {
+          AZURE_DEVOPS_EXT_PAT = vim.fn.getenv("AZURE_DEVOPS_EXT_PAT") or ""
+        },
+        terminalKind = "integrated",
+      },
+      {
+        type = "bashdb",
+        request = "launch",
+        name = "Debug: update-service-connection (args array)",
+        showDebugOutput = false,
+        pathBashdb = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb",
+        pathBashdbLib = vim.fn.stdpath("data") .. "/mason/packages/bash-debug-adapter/extension/bashdb_dir",
+        trace = false,
+        file = "${workspaceFolder}/support-scripts/update-service-connection-description.sh",
+        program = "${workspaceFolder}/support-scripts/update-service-connection-description.sh",
+        cwd = "${workspaceFolder}",
+        pathCat = "cat",
+        pathBash = "/usr/bin/bash",
+        pathMkfifo = "mkfifo",
+        pathPkill = "pkill",
+        args = { "--connection-name", "Dev-Pipelines", "--project", "terramate", "--org", "https://dev.azure.com/ADVW" },
+        argsString = "",
+        env = {
+          AZURE_DEVOPS_EXT_PAT = vim.fn.getenv("AZURE_DEVOPS_EXT_PAT") or ""
+        },
+        terminalKind = "integrated",
+      },
     }
+
 
     -- === JavaScript/TypeScript Configuration ===
     dap.adapters["pwa-node"] = {

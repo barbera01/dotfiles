@@ -4,7 +4,7 @@
 vim.g.mapleader = " "
 
 -- Disable problematic LSP servers in Mason
-vim.g.lazyvim_cmp = "blink"
+vim.g.lazyvim_cmp = "blink.cmp"
 
 -- Enable Nerd Font icons
 vim.g.have_nerd_font = true

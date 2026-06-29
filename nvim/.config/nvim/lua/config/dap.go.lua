@@ -1,4 +1,8 @@
-lua require('dap-go').setup {
+-- Go DAP configuration using dap-go plugin
+-- NOTE: This file is not currently loaded automatically
+-- To use it, require it from another config file or add it to lazy.nvim plugins
+
+return {
   -- Additional dap configurations can be added.
 
   -- dap_configurations accepts a list of tables where each entry

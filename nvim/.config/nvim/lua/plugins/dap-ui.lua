@@ -27,6 +27,13 @@ return {
         toggle = "t",
       },
       
+      -- Add borders to all windows
+      element_mappings = {},
+      
+      expand_lines = vim.fn.has("nvim-0.7") == 1,
+      
+      force_buffers = true,
+      
       -- Sleek layout with better proportions
       layouts = {
         {
@@ -53,25 +60,18 @@ return {
           position = "left",
         },
         {
-          -- Bottom console area
+          -- Bottom console area - stacked vertically
           elements = {
             {
               id = "console",
-              size = 1.0, -- Full bottom panel for output
+              size = 0.7, -- 70% for stdout/stderr console output (top)
             },
-          },
-          size = 15, -- Taller console for better visibility
-          position = "bottom",
-        },
-        {
-          -- Floating REPL (activated separately)
-          elements = {
             {
               id = "repl",
-              size = 1.0,
+              size = 0.3, -- 30% for REPL commands (bottom)
             },
           },
-          size = 0.3,
+          size = 30, -- Taller for better vertical stacking
           position = "bottom",
         },
       },
@@ -95,8 +95,8 @@ return {
       
       -- Better rendering
       render = {
-        max_type_length = 50,
-        max_value_lines = 200,
+        max_type_length = 100,
+        max_value_lines = 500, -- Show more lines in console
         indent = 2,
       },
       
@@ -110,12 +110,35 @@ return {
         },
       },
       
-      -- Expand lines by default
-      expand_lines = true,
-      
-      -- Force winbar
-      force_buffers = true,
     })
+    
+    -- Set clearer border colors for DAP UI windows (white for maximum visibility)
+    vim.api.nvim_set_hl(0, "DapUIFloatBorder", { fg = "#ffffff", bold = true })
+    vim.api.nvim_set_hl(0, "DapUIWinSelect", { fg = "#ffffff", bold = true })
+    
+    -- Make window separators more visible (white)
+    vim.api.nvim_set_hl(0, "DapUIVertSplit", { fg = "#ffffff", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "DapUIWinSeparator", { fg = "#ffffff", bg = "NONE" })
+    
+    -- Make console output more readable
+    vim.api.nvim_set_hl(0, "DapUIConsole", { fg = "#d4d4d4" })
+    vim.api.nvim_set_hl(0, "DapUIConsoleInfo", { fg = "#4ec9b0" })
+    vim.api.nvim_set_hl(0, "DapUIConsoleWarning", { fg = "#ffcb6b" })
+    vim.api.nvim_set_hl(0, "DapUIConsoleError", { fg = "#f44747" })
+    
+    -- Additional highlights for better visibility
+    vim.api.nvim_set_hl(0, "DapUINormal", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "DapUINormalNC", { bg = "NONE" })
+    
+    -- Set global window separator to be more visible during debug sessions
+    local original_winhighlight = vim.wo.winhighlight
+    dap.listeners.after.event_initialized["set_winhl"] = function()
+      vim.opt.fillchars:append({ vert = "│", horiz = "─", horizup = "┴", horizdown = "┬", vertleft = "┤", vertright = "├", verthoriz = "┼" })
+    end
+    
+    dap.listeners.before.event_terminated["restore_winhl"] = function()
+      vim.opt.fillchars = vim.opt.fillchars
+    end
 
     -- Enhanced auto-open/close with better UX
     local dapui_group = vim.api.nvim_create_augroup("DapuiConfig", { clear = true })
@@ -140,13 +163,27 @@ return {
     end
 
     -- Cool keymaps with better descriptions
+    -- Note: <leader>dc is reserved for DAP continue in keymaps.lua
     vim.keymap.set("n", "<leader>du", function()
       dapui.toggle()
     end, { desc = "🎛️  Toggle Debug UI" })
     
     vim.keymap.set("n", "<leader>dr", function()
-      dapui.toggle({ layout = 3 }) -- Toggle REPL
-    end, { desc = "💬 Toggle Debug REPL" })
+      dapui.toggle({ layout = 2 }) -- Toggle bottom panel with REPL + Console
+    end, { desc = "💬 Toggle Debug REPL + Console" })
+    
+    vim.keymap.set("n", "<leader>dC", function()
+      dapui.open({ layout = 2 }) -- Open bottom console panel
+      vim.cmd("wincmd j") -- Jump to bottom window
+    end, { desc = "📺 Open Debug Console (Shift+C)" })
+    
+    vim.keymap.set("n", "<leader>do", function()
+      dapui.float_element("console", { 
+        width = math.floor(vim.o.columns * 0.9),
+        height = math.floor(vim.o.lines * 0.9),
+        enter = true,
+      })
+    end, { desc = "📺 Float Console Output (large)" })
     
     vim.keymap.set("n", "<leader>de", function()
       dapui.eval()
