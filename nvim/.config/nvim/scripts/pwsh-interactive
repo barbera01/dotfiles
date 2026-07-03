@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# pwsh wrapper for powershell.nvim (used as its `shell` option).
+#
+# powershell.nvim starts PSES with BOTH -NonInteractive and -EnableConsoleRepl.
+# Since pwsh 7.4, -NonInteractive hard-blocks Read-Host/prompts:
+#   "PowerShell is in NonInteractive mode. Read and Prompt functionality is
+#    not available."
+# which breaks interactive debugging (the whole reason we use the console
+# REPL). Strip the flag; PSES's REPL manages its own input loop safely.
+args=()
+for a in "$@"; do
+  [[ $a == "-NonInteractive" ]] || args+=("$a")
+done
+exec pwsh "${args[@]}"

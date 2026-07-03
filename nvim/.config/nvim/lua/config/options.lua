@@ -2,13 +2,8 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 vim.g.mapleader = " "
+vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/site")
+vim.opt.clipboard = "unnamedplus"
 
 -- Disable problematic LSP servers in Mason
 vim.g.lazyvim_cmp = "blink.cmp"
-
--- Enable Nerd Font icons
-vim.g.have_nerd_font = true
-
--- Ensure proper icon rendering
-vim.opt.encoding = "utf-8"
-vim.opt.fileencoding = "utf-8"

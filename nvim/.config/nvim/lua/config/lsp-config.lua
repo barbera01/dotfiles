@@ -1,60 +1,78 @@
+-- LSP Configuration for LazyVim
+-- Note: LazyVim handles most LSP setup automatically
+-- This file is for custom LSP configurations
 return {
-  -- Mason, for automatically installing LSPs
-  {
-    "williamboman/mason.nvim",
-    config = function()
-      require("mason").setup() -- default config
-    end,
-  },
-
-  {
-    "williamboman/mason-lspconfig.nvim",
-    config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "Lua_ls",
-          "pyright",
-          "tsserver",
-          "html",
-          "cssls",
-          "jsonls",
-          "yamlls",
-          "dockerls",
-          "bashls",
-          "vimls",
-          "sumneko_lua",
-          "gopls",
-          "rust_analyzer",
-          "clangd",
-          "svelte",
-          "tailwindcss",
-          "intelephense",
-          "vuels",
-          "graphql",
-          "angularls",
-          "denols",
-          "jdtls",
-          "solargraph",
-          "elixirls",
-          "hls",
-          "cmake",
-          "PowerShell_es",
-          "terraformls",
-          "azure_pipelines_ls",
-        },
-      })
-    end,
-  },
-
-  -- LSPConfig, for configuring individual language servers
   {
     "neovim/nvim-lspconfig",
-    config = function()
-      local lspconfig = require("lspconfig")
-      lspconfig.lua_ls.setup({})
-      lspconfig.PowerShell_es.setup({})
-      lspconfig.terraformls.setup({})
-      lspconfig.azure_pipelines_ls.setup({})
-    end,
+    opts = {
+      servers = {
+        -- Python LSP is configured in lua/plugins/python.lua
+        -- via the LazyVim Python extra
+
+        -- Go LSP
+        gopls = {
+          settings = {
+            gopls = {
+              gofumpt = true,
+              staticcheck = true,
+              usePlaceholders = true,
+              completeUnimported = true,
+
+              analyses = {
+                unusedparams = true,
+                unusedwrite = true,
+                nilness = true,
+                shadow = true,
+                unreachable = true,
+              },
+
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+
+              codelenses = {
+                generate = true,
+                gc_details = false,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+            },
+          },
+        },
+
+        -- PowerShell LSP is owned by powershell.nvim (lua/plugins/powershell.lua),
+        -- which runs PSES with a console REPL so debugging is interactive.
+        -- Keep lspconfig's client off or two PSES instances fight per buffer.
+        powershell_es = { enabled = false },
+
+        -- Terraform LSP
+        terraformls = {},
+
+        -- Azure Pipelines LSP
+        azure_pipelines_ls = {},
+
+        -- Lua LSP configured by LazyVim by default
+        lua_ls = {
+          settings = {
+            Lua = {
+              workspace = {
+                checkThirdParty = false,
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+            },
+          },
+        },
+      },
+    },
   },
 }

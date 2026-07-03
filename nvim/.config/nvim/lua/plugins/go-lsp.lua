@@ -3,9 +3,8 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        -- Manual gopls configuration since Mason install fails
+        -- Let lspconfig resolve gopls from PATH/Mason
         gopls = {
-          cmd = { vim.fn.expand("~/go/bin/gopls") },
           settings = {
             gopls = {
               analyses = {

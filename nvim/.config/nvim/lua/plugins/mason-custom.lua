@@ -16,6 +16,9 @@ return {
         "prettier",
         "eslint_d",
         "typescript-language-server",
+        "debugpy",
+        -- PSES bundle for powershell.nvim (LSP + interactive dap debugging)
+        "powershell-editor-services",
       },
       -- Manually exclude problematic servers
       blacklist = { "nil", "gopls" },
@@ -33,6 +36,8 @@ return {
         "jsonls",
         "marksman",
         "ts_ls",
+        "pyright",  -- Python LSP
+        "ruff",     -- Python linter/formatter (also acts as LSP)
       },
     },
   },
