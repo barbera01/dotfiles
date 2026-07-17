@@ -401,3 +401,5 @@ export PATH="$PATH:/opt/mssql-tools18/bin"
 
 
 export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '/mnt/c/Users/AndyBarber/AppData/Roaming/npm' | paste -sd:)
+alias lzd-RT0='DOCKER_HOST=ssh://user@racetrack-0 lazydocker'
+alias lzd-RT1='DOCKER_HOST=ssh://user@racetrack-1 lazydocker'
