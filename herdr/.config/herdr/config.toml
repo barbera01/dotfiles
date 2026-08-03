@@ -1,0 +1,104 @@
+onboarding = false
+# herdr configuration
+# Keybindings tuned to match ~/.tmux.conf as closely as herdr's action model allows.
+
+[keys]
+# Prefix matches your tmux.conf (set -g prefix C-b / bind C-b send-prefix).
+prefix = "ctrl+b"
+
+# tmux default: bind r source-file ~/.tmux.conf \; display "reloaded"
+reload_config = "prefix+r"
+
+# tmux default: prefix+& kills the current window (with confirmation).
+close_tab = "prefix+ampersand"
+
+# tmux: bind % split-window -h -c "#{pane_current_path}"
+# tmux's -h flag makes side-by-side (left/right) panes, which herdr calls
+# a "vertical" split (the dividing line is vertical).
+split_vertical = "prefix+%"
+
+# tmux: bind '"' split-window -v -c "#{pane_current_path}"
+# tmux's -v flag makes top/bottom panes, which herdr calls a "horizontal"
+# split (the dividing line is horizontal).
+split_horizontal = "prefix+\""
+
+# tmux default: prefix+; jumps back to the last active pane.
+last_pane = "prefix+semicolon"
+
+# Your tmux.conf has no `setw -g mode-keys vi`, so tmux's real default for
+# pane navigation is prefix+arrow keys, not h/j/k/l. Herdr defaults to
+# h/j/k/l, so these are remapped to match tmux's actual behavior.
+focus_pane_left = "prefix+left"
+focus_pane_down = "prefix+down"
+focus_pane_up = "prefix+up"
+focus_pane_right = "prefix+right"
+
+# Bindings left at herdr's defaults because they already match tmux's
+# built-in defaults: new_tab (prefix+c), previous_tab (prefix+p),
+# next_tab (prefix+n), close_pane (prefix+x), zoom (prefix+z).
+#
+# Not ported (no herdr equivalent):
+#   - tmux `bind d run-shell '...'`   broadcasts the current pane's cwd to
+#     every other pane in the window via `tmux send-keys`.
+#   - tmux `bind y setw synchronize-panes`  toggles synchronized-panes
+#     (mirrors keystrokes to every pane). Herdr has no synchronized-panes
+#     concept.
+#   - tmux `bind I` / `bind U`  are TPM plugin install/update, specific to
+#     tmux's plugin manager.
+#   - tmux prefix+o (cycle to next pane) was intentionally NOT bound here:
+#     herdr already uses prefix+o by default for open_notification_target,
+#     and you chose to keep that rather than override it.
+
+[ui]
+show_agent_labels_on_pane_borders = true
+host_cursor = "native"
+hide_tab_bar_when_single_tab = true
+
+# --- Sidebar/theme: closest herdr equivalent to tmux's status bar ---
+# tmux's status-right shows session, application, uptime, net-speed via the
+# Catppuccin plugin. Herdr has no status bar, but the sidebar is the nearest
+# analogue. Not a full port: herdr has no uptime or net-speed tokens, and the
+# sidebar can't be moved to the top like `status-position top`.
+sidebar_width = 32
+
+[theme]
+# tmux uses @catppuccin_flavor "macchiato". Herdr's built-in "catppuccin"
+# theme is mocha-based (no macchiato/frappe variant exists), so this is the
+# closest match, not exact. See [theme.custom] below if you want true
+# macchiato hex values instead.
+name = "catppuccin"
+
+# Uncomment to hand-roll the real macchiato palette instead of herdr's
+# built-in (mocha-based) "catppuccin" theme:
+# [theme.custom]
+# accent = "#8aadf4"   # macchiato blue
+# panel_bg = "#24273a"  # macchiato base
+
+[ui.sidebar.agents]
+row_gap = 0
+# state_icon/state_text ~= tmux pane activity; workspace ~= session; agent ~= application
+rows = [
+  ["state_icon", "workspace", "tab"],
+  ["agent"],
+]
+
+[ui.sidebar.spaces]
+row_gap = 0
+# branch/git_status ~= nothing in your current tmux.conf, but closest thing
+# herdr offers to a persistent "what am I looking at" segment.
+rows = [
+  ["state_icon", "workspace"],
+  ["branch", "git_status"],
+]
+
+# herdr has no adjustable gap size — pane_gaps/pane_borders are booleans only.
+# Left at defaults (border + fixed-size gap) since a smaller-but-nonzero gap
+# isn't currently possible; see https://herdr.dev for feature requests.
+# pane_borders = true
+# pane_gaps = true:qa
+[[keys.command]]
+key = "prefix+y"                       # "all panes"; prefix+e is taken by scrollback
+type = "plugin_action"                 # must be plugin_action (not plugin_pane)
+command = "synchronize-panes.broadcast"
+description = "broadcast a command to all panes in this Bab"
+
