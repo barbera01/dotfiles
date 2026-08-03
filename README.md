@@ -31,6 +31,7 @@ Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 - **alacritty** - Terminal emulator configuration
 - **btop** - System resource monitor
+- **claude** - Claude Code global config (CLAUDE.md, settings.json, custom agents)
 - **herdr** - Terminal multiplexer configuration
 
 ## Usage

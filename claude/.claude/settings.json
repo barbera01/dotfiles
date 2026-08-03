@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "respectGitignore": true,
+  "cleanupPeriodDays": 30,
+  "env": {},
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "List",
+      "WebFetch",
+      "WebSearch",
+      "TodoWrite",
+      "mcp__context7",
+      "mcp__playwright",
+      "mcp__drawio",
+      "mcp__azure-pricing",
+      "mcp__atlassian",
+      "mcp__datadog",
+      "mcp__azure-devops",
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl top *)",
+      "Bash(kubectl diff *)",
+      "Bash(kubectl config *)",
+      "Bash(kubectl explain *)",
+      "Bash(kubectl api-resources)",
+      "Bash(kubectl version)",
+      "Bash(kubectl cluster-info)",
+      "Bash(terraform plan *)",
+      "Bash(terraform show *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform fmt *)",
+      "Bash(az * show *)",
+      "Bash(az * list *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status)",
+      "Bash(git branch *)",
+      "Bash(docker ps *)",
+      "Bash(docker images *)",
+      "Bash(docker logs *)",
+      "Bash(docker inspect *)",
+      "Bash(go build *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go fmt *)",
+      "Bash(go mod *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo rm *)",
+      "Bash(dd *)",
+      "Bash(mkfs *)"
+    ],
+    "ask": [
+      "Edit",
+      "Write",
+      "Bash(kubectl apply *)",
+      "Bash(kubectl delete *)",
+      "Bash(kubectl scale *)",
+      "Bash(kubectl rollout *)",
+      "Bash(kubectl exec *)",
+      "Bash(kubectl patch *)",
+      "Bash(kubectl label *)",
+      "Bash(kubectl annotate *)",
+      "Bash(kubectl cordon *)",
+      "Bash(kubectl drain *)",
+      "Bash(kubectl taint *)",
+      "Bash(kubectl create *)",
+      "Bash(kubectl replace *)",
+      "Bash(kubectl port-forward *)",
+      "Bash(terraform apply *)",
+      "Bash(terraform destroy *)",
+      "Bash(terraform import *)",
+      "Bash(az * create *)",
+      "Bash(az * delete *)",
+      "Bash(az * update *)",
+      "Bash(az * set *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git reset *)",
+      "Bash(docker run *)",
+      "Bash(docker exec *)",
+      "Bash(docker rm *)",
+      "Bash(docker rmi *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$FILE_PATH\" | grep -qE '\\.(js|jsx|ts|tsx)$'; then prettier --write \"$FILE_PATH\" 2>/dev/null || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$FILE_PATH\" | grep -qE '\\.py$'; then black \"$FILE_PATH\" 2>/dev/null || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$FILE_PATH\" | grep -qE '\\.go$'; then gofmt -w \"$FILE_PATH\" 2>/dev/null || true; fi"
+          },
+          {
+            "type": "command",
+            "command": "if echo \"$FILE_PATH\" | grep -qE '\\.(tf|tfvars)$'; then terraform fmt \"$FILE_PATH\" 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/home/andy/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "slack@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "showTurnDuration": true
+}
