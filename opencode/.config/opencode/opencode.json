@@ -1,0 +1,714 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "steroids",
+
+  "autoupdate": "notify",
+
+  "model": "anthropic/claude-sonnet-4-5",
+  "small_model": "github-copilot/claude-haiku-4.5",
+
+  "provider": {
+    "omlx": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "oMLX",
+      "options": {
+        "baseURL": "http://aba-mbp.home-cloud.uk:8000/v1",
+        "apiKey": "tttt"
+      },
+      "models": {
+        "Qwen3.5-9B-MLX-4bit": {
+          "name": "Qwen3.5-9B-MLX-4bit",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+
+        "Qwen2.5-Coder-7B-4bit": {
+          "name": "Qwen2.5-Coder-7B-4bit",
+          "modalities": {
+            "input": ["text"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 32768,
+            "output": 4768
+          }
+        },
+        "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": {
+          "name": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 131072,
+            "output": 8768
+          }
+        },
+
+        "Qwen3.6-27B-UD-MLX-4bit": {
+          "name": "Qwen3.6-27B-UD-MLX-4bit",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 65536,
+            "output": 8768
+          }
+        },
+        "gemma-4-26b-a4b-it-4bit": {
+          "name": "gemma-4-26b-a4b-it-4bit",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "reasoning": false,
+          "limit": {
+            "context": 98304,
+            "output": 4096
+          },
+          "options": {
+            "temperature": 0.2,
+            "top_p": 0.9,
+            "top_k": 40,
+            "min_p": 0.05,
+            "repetition_penalty": 1.05
+          }
+        },
+        "gemma-4-12B-4bit": {
+          "name": "gemma-4-12B-4bit",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "reasoning": false,
+          "limit": {
+            "context": 98304,
+            "output": 4096
+          },
+          "options": {
+            "temperature": 0.2,
+            "top_p": 0.9,
+            "top_k": 40,
+            "min_p": 0.05,
+            "repetition_penalty": 1.05
+          }
+        },
+        "gpt-oss-20b-MXFP4-Q8": {
+          "name": "gpt-oss-20b-MXFP4-Q8",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 65536,
+            "output": 8768
+          }
+        },
+        "Qwen3.6-35B-A3B-4bit": {
+          "name": "Qwen3.6-35B-A3B-4bit",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "limit": {
+            "context": 65536,
+            "output": 8768
+          }
+        }
+      }
+    },
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (Local Mac)",
+      "options": {
+        "baseURL": "http://172.16.108.110:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:14b-instruct-q4_K_M": {
+          "id": "qwen2.5-coder:14b-instruct-q4_K_M",
+          "name": "qwen2.5-coder:14b-instruct-q4_K_M (local)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          },
+          "options": {
+            "num_ctx": 32768,
+            "presence_penalty": 0
+          }
+        },
+        "gemma4:26b-a4b-it-q4_K_M": {
+          "id": "gemma4:26b-a4b-it-q4_K_M",
+          "name": "gemma4:26b-a4b-it-q4_K_M (local macbook)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "num_ctx": 65536,
+            "presence_penalty": 0,
+            "temperature": 0.25,
+            "top_p": 0.8
+          }
+        },
+        "deepseek-r1:14b": {
+          "id": "deepseek-r1:14b",
+          "name": "deepseek-r1:14b (local)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          }
+        },
+        "qwen3.5:35b-a3b-coding-nvfp4": {
+          "id": "qwen3.5:35b-a3b-coding-nvfp4",
+          "name": "qwen3.5:35b-a3b-coding-nvfp4 (local)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          },
+          "options": {
+            "num_ctx": 131072,
+            "presence_penalty": 0
+          }
+        },
+        "qwen2.5-coder:14b": {
+          "id": "qwen2.5-coder:14b",
+          "name": "qwen2.5-coder:14b (local)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          },
+          "options": {
+            "num_ctx": 32768,
+            "presence_penalty": 0
+          }
+        },
+        "gemma4:26b": {
+          "id": "gemma4:26b",
+          "name": "Gemma 4 26B (local)",
+          "tools": true,
+          "tool_call": true,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "num_ctx": 65536,
+            "presence_penalty": 0,
+            "temperature": 0.7
+          }
+        },
+        "qwen3.6:27b": {
+          "id": "qwen3.6:27b",
+          "name": "qwen3.6:27b (local, no-think)",
+          "tools": true,
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 32768
+          },
+          "options": {
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0,
+            "repeat_penalty": 1,
+            "num_ctx": 65536
+          }
+        },
+        "qwen3.6:27b-think": {
+          "id": "qwen3.6:27b",
+          "name": "qwen3.6:27b (local, thinking)",
+          "tools": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 32768
+          },
+          "options": {
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0,
+            "repeat_penalty": 1,
+            "num_ctx": 65536
+          }
+        },
+        "qwen3:14b": {
+          "id": "qwen3:14b",
+          "name": "qwen3:14b (local, no-think)",
+          "tools": true,
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 32768
+          },
+          "options": {
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0,
+            "repeat_penalty": 1,
+            "num_ctx": 65536
+          }
+        },
+        "qwen3:8b": {
+          "id": "qwen3:8b",
+          "name": "qwen3:9b (local, no-think)",
+          "tools": true,
+          "tool_call": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 32768
+          },
+          "options": {
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0,
+            "repeat_penalty": 1,
+            "num_ctx": 65536
+          }
+        },
+        "qwen3:14b-think": {
+          "id": "qwen3:14b",
+          "name": "qwen3:14b (local, thinking)",
+          "tools": true,
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 32768,
+            "output": 32768
+          },
+          "options": {
+            "top_k": 20,
+            "min_p": 0,
+            "presence_penalty": 0,
+            "repeat_penalty": 1,
+            "num_ctx": 65536
+          }
+        }
+      }
+    },
+    "local-ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "local-ollama",
+      "options": {
+        "baseURL": "https://ollama.home-cloud.uk"
+      },
+      "models": {
+        "qwen35": {
+          "id": "qwen3.5:latest"
+        }
+      },
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llamacpp (HP)",
+      "options": {
+        "baseURL": "http://ollama.lab.home-cloud.uk:8181/v1"
+      },
+      "models": {
+        "unsloth/gemma-4-12b-it-GGUF:Q4_K_M": {
+          "name": "unsloth/gemma-4-12b-it-GGUF:Q4_K_M",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "attachment": true,
+          "reasoning": false,
+          "limit": {
+            "context": 98304,
+            "output": 4096
+          },
+          "options": {
+            "temperature": 0.2,
+            "top_p": 0.9,
+            "top_k": 40,
+            "min_p": 0.05,
+            "repetition_penalty": 1.05
+          }
+        },
+        "unsloth/Qwen2.5-Coder-7B-Instruct-GGUF:Q5_K_M": {
+          "id": "unsloth/Qwen2.5-Coder-7B-Instruct-GGUF:Q5_K_M",
+          "name": "Qwen2.5-Coder-7B (llama.cpp)",
+          "tool_call": true,
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          },
+          "options": {
+            "temperature": 0.2,
+            "top_p": 0.9,
+            "presence_penalty": 0
+          }
+        },
+        "unsloth/Qwen3.5-4B-GGUF:UD-Q8_K_X": {
+          "id": "unsloth/Qwen3.5-4B-GGUF:UD-Q8_K_X",
+          "name": "unsloth/Qwen3.5-4B-GGUF:UD-Q8_K_X",
+          "tool_call": true,
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          },
+          "options": {
+            "num_ctx": 16384,
+            "presence_penalty": 0
+          }
+        },
+        "Qwen/Qwen3-8B-GGUF:Q8_0": {
+          "id": "Qwen/Qwen3-8B-GGUF:Q8_0",
+          "name": "Qwen/Qwen3-8B-GGUF:Q8_0",
+          "tool_call": true,
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          },
+          "options": {
+            "num_ctx": 16384,
+            "presence_penalty": 0
+          }
+        }
+      }
+    }
+  },
+  "agent": {
+    "steroids": {
+      "mode": "primary",
+      "model": "omlx/gpt-oss-20b-MXFP4-Q8",
+      "color": "primary",
+      "permission": {
+        "*": "ask",
+
+        "list": "allow",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "skill": "allow",
+        "webfetch": "allow",
+        "todowrite": "allow",
+        "websearch": "allow",
+        "question": "allow",
+        "mcp": "allow",
+
+        "edit": "ask",
+        "write": "ask",
+        // --- Secrets & sensitive file guards ---
+        "read:.env": "deny",
+        "read:.env.*": "deny",
+        "read:**/.env": "deny",
+        "read:**/.env.*": "deny",
+        "read:**/*.pem": "deny",
+        "read:**/*.key": "deny",
+        "read:**/*.pfx": "deny",
+        "read:**/*.p12": "deny",
+        "read:**/secrets/**": "deny",
+        "write:.env": "deny",
+        "write:.env.*": "deny",
+        "write:**/.env": "deny",
+        "write:**/.env.*": "deny",
+        "edit:.env": "deny",
+        "edit:.env.*": "deny",
+
+        "bash": {
+          "*": "ask",
+
+          "kubectl get *": "allow",
+          "kubectl describe *": "allow",
+          "kubectl logs *": "allow",
+          "kubectl top *": "allow",
+          "kubectl config current-context": "allow",
+          "kubectl config get-contexts": "allow",
+
+          "kubectl apply *": "ask",
+          "kubectl delete *": "ask",
+          "kubectl scale *": "ask",
+          "kubectl rollout *": "ask",
+          "kubectl exec *": "ask"
+        }
+      },
+      "prompt": "{file:./prompts/steroids.txt}"
+    },
+
+    // ── ORCHESTRATOR ────────────────────────────────────────────────
+    // PRIMARY. You live here. Plans, reasons, coordinates subagents.
+    // Read-only bash. Does not implement or write wiki directly.
+    // Low token volume — Opus cost is justified.
+    //
+    // Cloud fallback: github-copilot/gpt-5.4 ($8/1M) if Opus budget is tight.
+    "orchestrator": {
+      "description": "Senior SRE orchestrator. Plans complex tasks, coordinates scout and executor subagents, and maintains overall session context. Use for any multi-step, multi-system, or production-impacting work.",
+      "mode": "primary",
+      "model": "github-copilot/gpt-5.4",
+      "color": "secondary",
+      "temperature": 0.1,
+      "permission": {
+        "*": "deny",
+        "list": "allow",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "skill": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "mcp": "allow",
+        "edit": "deny",
+        "write": "deny",
+        "task": {
+          "*": "deny",
+          "scout": "allow",
+          "executor": "ask"
+        },
+        "bash": {
+          "*": "deny",
+          "kubectl get *": "allow",
+          "kubectl describe *": "allow",
+          "kubectl logs *": "allow",
+          "kubectl top *": "allow",
+          "kubectl config current-context": "allow",
+          "kubectl config get-contexts": "allow",
+          "terraform plan *": "allow",
+          "terraform show *": "allow",
+          "az * show *": "allow",
+          "az * list *": "allow",
+          "git log *": "allow",
+          "git diff *": "allow",
+          "git status": "allow"
+        }
+      },
+      "prompt": "{file:./prompts/orchestrator.txt}"
+    },
+
+    // ── EXECUTOR ────────────────────────────────────────────────────
+    // SUBAGENT. Implementation. Invoked by orchestrator or via @executor.
+    // Full tool access, all mutations ask-gated.
+    //
+    // LOCAL FIRST: gpt-oss-20b — already working, strong tool use and
+    //   function calling at 62K context, designed for agentic workflows.
+    //   Switch to Qwen3.6 for heavier code/repo tasks.
+    //
+    // Cloud fallbacks (swap model string):
+    //   github-copilot/claude-sonnet-4-6  $15/1M — best Anthropic accuracy
+    //   github-copilot/gpt-5.4             $8/1M — cheaper, good general tasks
+    "executor": {
+      "description": "Full-access implementation agent. Writes code, edits files, runs bash, applies Terraform and kubectl changes. Invoke for concrete implementation work once the approach is decided. Can be spawned in parallel for independent subtasks.",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5.3-codex",
+      "color": "primary",
+      "temperature": 0.2,
+      "permission": {
+        "*": "ask",
+        "list": "allow",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "skill": "allow",
+        "webfetch": "allow",
+        "websearch": "allow",
+        "todowrite": "allow",
+        "question": "allow",
+        "mcp": "allow",
+        "edit": "ask",
+        "write": "ask",
+        "bash": {
+          "*": "ask",
+          "kubectl get *": "allow",
+          "kubectl describe *": "allow",
+          "kubectl logs *": "allow",
+          "kubectl top *": "allow",
+          "kubectl config current-context": "allow",
+          "kubectl config get-contexts": "allow",
+          "kubectl apply *": "ask",
+          "kubectl delete *": "ask",
+          "kubectl scale *": "ask",
+          "kubectl rollout *": "ask",
+          "kubectl exec *": "ask",
+          "kubectl patch *": "ask",
+          "terraform apply *": "ask",
+          "terraform destroy *": "ask",
+          "az * create *": "ask",
+          "az * delete *": "ask",
+          "az * update *": "ask",
+          "git commit *": "ask",
+          "git push *": "ask",
+          "git checkout *": "ask",
+          "docker run *": "ask",
+          "docker exec *": "ask"
+        }
+      },
+      "prompt": "{file:./prompts/executor.txt}"
+    },
+
+    // ── SCOUT ───────────────────────────────────────────────────────
+    // SUBAGENT. Cheap read-only triage. Invoked automatically before
+    // expensive orchestrator reasoning, or manually via @scout.
+    //
+    // LOCAL: gemma-4-26B-A4B — only 3.8B active params, very fast,
+    //   good reading comprehension. Ideal for quick file/state triage
+    //   where you want a summary, not deep reasoning.
+    //
+    // Cloud fallback: github-copilot/gpt-5.4-mini ($1.60/1M output)
+    "scout": {
+      "description": "Cheap read-only triage agent. Reads files, greps patterns, checks git/kubectl/terraform/az state, returns a compact summary. Invoke before expensive planning to gather context cheaply. Does not plan or implement.",
+      "mode": "subagent",
+      "model": "github-copilot/gpt-5.4-mini",
+      "temperature": 0.0,
+      "steps": 20,
+      "permission": {
+        "*": "deny",
+        "list": "allow",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "question": "allow",
+        "todowrite": "allow",
+        "bash": {
+          "*": "deny",
+          "kubectl get *": "allow",
+          "kubectl describe *": "allow",
+          "kubectl logs *": "allow",
+          "kubectl config current-context": "allow",
+          "kubectl config get-contexts": "allow",
+          "git log *": "allow",
+          "git diff *": "allow",
+          "git status": "allow",
+          "terraform show *": "allow",
+          "az * list *": "allow",
+          "az * show *": "allow"
+        }
+      },
+      "prompt": "{file:./prompts/scout.txt}"
+    }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": false
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": false
+    },
+    "drawio": {
+      "type": "local",
+      "command": ["npx", "-y", "@drawio/mcp"],
+      "enabled": false
+    },
+    "azure-pricing": {
+      "type": "remote",
+      "url": "https://mcp-azure-pricing.andybarber.dev/sse",
+      "enabled": false
+    },
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "enabled": false
+    },
+    "datadog": {
+      "type": "remote",
+      "url": "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp",
+      "enabled": false
+    },
+
+    "azure-devops": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@azure-devops/mcp",
+        "sortedproapp",
+        "-d",
+        "core",
+        "work",
+        "work-items",
+        "repositories",
+        "pipelines"
+      ],
+      "enabled": false
+    }
+  },
+
+  "tools": {
+    "write": true,
+    "edit": true,
+    "bash": true,
+    "mcp": true
+  },
+
+  "permission": {
+    "*": "ask",
+    "edit": "ask",
+    "bash": "ask"
+  },
+
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
+
+  "watcher": {
+    "ignore": [
+      "**/.git/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/.nuxt/**",
+      "**/coverage/**",
+      "**/bin/**",
+      "**/obj/**",
+      "**/vendor/**",
+      "**/.terraform/**",
+      "**/.venv/**",
+      "**/venv/**",
+      "**/__pycache__/**",
+      "**/*.log"
+    ]
+  },
+
+  "formatter": {
+    "javascript": {
+      "command": ["prettier", "--write"],
+      "extensions": [".js", ".jsx", ".ts", ".tsx"]
+    },
+    "python": {
+      "command": ["black", "-"],
+      "extensions": [".py"]
+    }
+  },
+  "lsp": true
+}

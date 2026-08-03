@@ -107,13 +107,17 @@ freelens() {
 # Usage:
 #   az-ctx                 # interactive selection
 #   az-ctx ABA             # set a specific context
-#   az-ctx --persist       # also persist into tmux server env
+#   az-ctx --persist       # also persist across panes: tmux server env in
+#                          # tmux, or a state file (herdr has no server-side
+#                          # global env, so new herdr panes source it instead)
+: "${HERDR_AZURE_ENV_FILE:=$HOME/.config/herdr/azure-env.zsh}"
+
 az-ctx() {
   emulate -L zsh
 
-  local persist_tmux=0
+  local persist=0
   if [[ "${1:-}" == "--persist" ]]; then
-    persist_tmux=1
+    persist=1
     shift
   fi
 
@@ -171,7 +175,7 @@ az-ctx() {
       ;;
   esac
 
-  if (( persist_tmux )) && [[ -n "${TMUX:-}" ]]; then
+  if (( persist )) && [[ -n "${TMUX:-}" ]]; then
     if [[ -n "${AZURE_CONFIG_DIR:-}" ]]; then
       tmux set-environment -g AZURE_CONFIG_DIR "$AZURE_CONFIG_DIR"
     else
@@ -183,6 +187,20 @@ az-ctx() {
     else
       tmux set-environment -gu KUBECONFIG
     fi
+  fi
+
+  # herdr has no tmux-style server-side global env, so persist via a state
+  # file instead; new herdr panes source it near the top of this file.
+  if (( persist )) && [[ -n "${HERDR_ENV:-}" ]]; then
+    mkdir -p "${HERDR_AZURE_ENV_FILE:h}"
+    {
+      if [[ -n "${AZURE_CONFIG_DIR:-}" ]]; then
+        echo "export AZURE_CONFIG_DIR=${(qq)AZURE_CONFIG_DIR}"
+      fi
+      if [[ -n "${KUBECONFIG:-}" ]]; then
+        echo "export KUBECONFIG=${(qq)KUBECONFIG}"
+      fi
+    } > "$HERDR_AZURE_ENV_FILE"
   fi
 
   # If a context was set and login is required
@@ -268,8 +286,14 @@ az-sub() {
 
 }
 
-# --- Auto prompt for Azure context when inside tmux ---
-if [[ -n "${TMUX:-}" && -z "${AZURE_CONFIG_DIR:-}" && -t 0 ]]; then
+# --- Auto prompt for Azure context when inside tmux or herdr ---
+# herdr panes don't inherit a server-side global env (unlike tmux), so pick
+# up whatever context was last persisted via `az-ctx --persist` first.
+if [[ -n "${HERDR_ENV:-}" && -z "${AZURE_CONFIG_DIR:-}" && -r "$HERDR_AZURE_ENV_FILE" ]]; then
+  source "$HERDR_AZURE_ENV_FILE"
+fi
+
+if [[ ( -n "${TMUX:-}" || -n "${HERDR_ENV:-}" ) && -z "${AZURE_CONFIG_DIR:-}" && -t 0 ]]; then
   az-ctx
 fi
 
@@ -403,3 +427,6 @@ export PATH="$PATH:/opt/mssql-tools18/bin"
 export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '/mnt/c/Users/AndyBarber/AppData/Roaming/npm' | paste -sd:)
 alias lzd-RT0='DOCKER_HOST=ssh://user@racetrack-0 lazydocker'
 alias lzd-RT1='DOCKER_HOST=ssh://user@racetrack-1 lazydocker'
+
+# Fix Wayland clipboard for nvim/wl-clipboard under WSLg (real socket lives here, not /run/user/$UID)
+export XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir
